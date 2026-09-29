@@ -21,7 +21,10 @@ design/                 Export original del diseño (referencia)
 - **Animaciones**: títulos que suben línea por línea, manifiesto que se ilumina al leer, tarjetas con entrada escalonada e inclinación 3D al pasar el mouse, cinta infinita que reacciona al scroll, parallax de ornamentos florales, botones magnéticos.
 - **"Así nace tu torta"**: escena fija en la que la torta se arma capa por capa mientras haces scroll.
 - **Formulario → WhatsApp**: arma el mensaje de cotización y abre WhatsApp. Valida que la fecha tenga mínimo 3 días de anticipación.
-- Menú móvil a pantalla completa, nav que se compacta y se oculta al bajar, botón flotante de WhatsApp.
+- **Mili, la tortica asistente**: siempre abajo a la derecha, salta y saluda cada 2 segundos y muestra globos de diálogo. Al tocarla abre un panel con WhatsApp, Instagram y un formulario para pedir la torta (se envía por WhatsApp).
+- Header que desaparece al bajar: con mouse reaparece al acercar el puntero al borde superior; en celular, al hacer scroll hacia arriba.
+- Menú móvil a pantalla completa.
+- En celular se desactivan efectos costosos (desenfoques, recortes animados) para que las animaciones vayan fluidas.
 - Respeta `prefers-reduced-motion`.
 
 ## Plugins (vía CDN)

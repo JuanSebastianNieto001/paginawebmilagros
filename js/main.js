@@ -9,6 +9,9 @@
   const root = document.documentElement;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const hasGsap = typeof window.gsap !== 'undefined' && typeof window.ScrollTrigger !== 'undefined';
+  // En celulares/tablets se evitan efectos costosos (blur, clip-path animado) para que todo vaya fluido.
+  const lite = window.matchMedia('(hover: none), (pointer: coarse)').matches || window.innerWidth <= 860;
+  const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
   /* ---------- Siempre arrancar arriba en cada recarga ---------- */
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
@@ -69,7 +72,9 @@
 
     tl.to(intro.querySelector('.intro__progress'), { autoAlpha: 0, duration: 0.2 }, 0)
       // 1. El último cuadro (logo) se acerca y se desenfoca en rosa
-      .to(video, { scale: 1.08, filter: 'blur(6px) saturate(1.15)', duration: 0.6, ease: 'power2.in' }, 0)
+      .to(video, lite
+        ? { scale: 1.06, duration: 0.5, ease: 'power2.in' }
+        : { scale: 1.08, filter: 'blur(6px) saturate(1.15)', duration: 0.6, ease: 'power2.in' }, 0)
       .to(intro.querySelector('.intro__veil'), { opacity: 1, duration: 0.5 }, 0)
       // 2. Cortina ciruela que sube por columnas desde el centro
       .to(cols, { scaleY: 1, duration: 0.45, stagger: { each: 0.04, from: 'center' } }, 0.2)
@@ -79,7 +84,7 @@
       // 3. La cortina se abre hacia arriba revelando la web
       .set(cols, { transformOrigin: 'top' })
       .to(cols, { scaleY: 0, duration: 0.55, stagger: { each: 0.04, from: 'edges' }, ease: 'power3.inOut' })
-      .fromTo('#page', { scale: 1.03, filter: 'blur(3px)' }, { scale: 1, filter: 'blur(0px)', duration: 0.8, ease: 'power3.out', clearProps: 'transform,filter' }, '<')
+      .fromTo('.hero__intro', { scale: 1.04 }, { scale: 1, duration: 0.8, ease: 'power3.out', clearProps: 'transform' }, '<')
       .add(unlockPage, '-=0.4');
   }
 
@@ -181,8 +186,10 @@
   ScrollTrigger.batch('[data-card]', {
     start: 'top 88%',
     onEnter: (batch) => gsap.fromTo(batch,
-      { autoAlpha: 0, y: 70, clipPath: 'inset(12% 0% 0% 0%)' },
-      { autoAlpha: 1, y: 0, clipPath: 'inset(0% 0% 0% 0%)', duration: 1.2, ease: 'power4.out', stagger: 0.14, overwrite: true })
+      lite ? { autoAlpha: 0, y: 50 } : { autoAlpha: 0, y: 70, clipPath: 'inset(12% 0% 0% 0%)' },
+      lite
+        ? { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power3.out', stagger: 0.1, overwrite: true }
+        : { autoAlpha: 1, y: 0, clipPath: 'inset(0% 0% 0% 0%)', duration: 1.2, ease: 'power4.out', stagger: 0.14, overwrite: true })
   });
   gsap.set('[data-card]', { autoAlpha: 0 });
 
@@ -204,7 +211,7 @@
   const track = document.querySelector('.marquee__track');
   if (track) {
     const loop = gsap.to(track, { xPercent: -50, duration: 28, ease: 'none', repeat: -1 });
-    ScrollTrigger.create({
+    if (!lite) ScrollTrigger.create({
       trigger: '.marquee', start: 'top bottom', end: 'bottom top',
       onUpdate: (self) => {
         const dir = self.direction;
@@ -266,10 +273,14 @@
   });
 
   /* ---------- Historia: la foto se descubre ---------- */
-  gsap.fromTo('[data-clip]', { clipPath: 'inset(15% 15% 15% 15%)' }, {
-    clipPath: 'inset(0% 0% 0% 0%)', ease: 'none',
-    scrollTrigger: { trigger: '.historia', start: 'top 80%', end: 'center center', scrub: true }
-  });
+  if (lite) {
+    gsap.from('[data-clip]', { autoAlpha: 0, y: 40, duration: 0.9, ease: 'power3.out', scrollTrigger: { trigger: '[data-clip]', start: 'top 85%' } });
+  } else {
+    gsap.fromTo('[data-clip]', { clipPath: 'inset(15% 15% 15% 15%)' }, {
+      clipPath: 'inset(0% 0% 0% 0%)', ease: 'none',
+      scrollTrigger: { trigger: '.historia', start: 'top 80%', end: 'center center', scrub: true }
+    });
+  }
   gsap.from('.historia__list li', { autoAlpha: 0, x: -24, stagger: 0.12, duration: 0.9, ease: 'power3.out', scrollTrigger: { trigger: '.historia__list', start: 'top 90%' } });
 
   /* ---------- Galería ---------- */
@@ -283,7 +294,7 @@
     const speed = parseFloat(el.dataset.parallax) || 0.1;
     gsap.to(el, { y: () => speed * window.innerHeight * 2, ease: 'none', scrollTrigger: { trigger: el.parentElement, start: 'top bottom', end: 'bottom top', scrub: true, invalidateOnRefresh: true } });
   });
-  gsap.utils.toArray('[data-parallax-inner]').forEach((el) => {
+  if (!lite) gsap.utils.toArray('[data-parallax-inner]').forEach((el) => {
     gsap.fromTo(el, { yPercent: -18 }, { yPercent: 18, ease: 'none', scrollTrigger: { trigger: el.closest('figure'), start: 'top bottom', end: 'bottom top', scrub: true } });
   });
 
@@ -337,18 +348,33 @@
     });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
 
-    // Nav: compacta al bajar, se oculta al hacer scroll hacia abajo y vuelve al subir
+    // Nav: al bajar desaparece. Con mouse, vuelve solo al acercar el puntero al borde superior;
+    // en pantallas táctiles (sin mouse) vuelve al hacer scroll hacia arriba.
     const nav = document.getElementById('nav');
-    const wa = document.querySelector('.wa-float');
     const sections = ['tortas', 'proceso', 'historia', 'galeria', 'contacto'].map((id) => document.getElementById(id));
     const navLinks = links.querySelectorAll('a');
+    const HIDE_AFTER = 160;
     let lastY = 0;
+    let scrollingUp = false;
+    let pointerNearTop = false;
+    const updateNav = () => {
+      const y = window.scrollY;
+      const wantsNav = finePointer ? pointerNearTop : scrollingUp;
+      nav.classList.toggle('is-scrolled', y > 60);
+      nav.classList.toggle('is-hidden', y > HIDE_AFTER && !wantsNav && !links.classList.contains('is-open'));
+    };
+    if (finePointer) {
+      document.addEventListener('mousemove', (e) => {
+        const near = e.clientY < 96 || nav.matches(':hover');
+        if (near !== pointerNearTop) { pointerNearTop = near; updateNav(); }
+      }, { passive: true });
+      document.documentElement.addEventListener('mouseleave', () => { pointerNearTop = false; updateNav(); });
+    }
     const onScroll = () => {
       const y = window.scrollY;
-      nav.classList.toggle('is-scrolled', y > 60);
-      nav.classList.toggle('is-hidden', y > 700 && y > lastY && !links.classList.contains('is-open'));
-      wa.classList.toggle('is-visible', y > window.innerHeight * 0.8);
+      if (Math.abs(y - lastY) > 4) scrollingUp = y < lastY;
       lastY = y;
+      updateNav();
 
       let current = null;
       sections.forEach((s) => { if (s && s.getBoundingClientRect().top < window.innerHeight * 0.4) current = s.id; });
@@ -356,10 +382,15 @@
     };
     window.addEventListener('scroll', onScroll, { passive: true });
 
-    // Formulario → WhatsApp
-    const form = document.getElementById('quoteForm');
-    const hint = document.getElementById('formHint');
-    const fecha = document.getElementById('fecha');
+    bindQuoteForm(document.getElementById('quoteForm'), document.getElementById('formHint'), '.field');
+    bindQuoteForm(document.getElementById('miliForm'), document.querySelector('.mili-form__hint'), '.mili-field');
+    setupMili();
+  }
+
+  // Valida el pedido y lo abre en WhatsApp con el mensaje ya armado.
+  function bindQuoteForm(form, hint, fieldSel) {
+    if (!form) return;
+    const fecha = form.elements.fecha;
     const min = new Date();
     min.setDate(min.getDate() + 3);
     const pad = (n) => String(n).padStart(2, '0');
@@ -368,7 +399,7 @@
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const data = Object.fromEntries(new FormData(form));
-      form.querySelectorAll('.field').forEach((f) => f.classList.remove('is-invalid'));
+      form.querySelectorAll(fieldSel).forEach((f) => f.classList.remove('is-invalid'));
 
       if (!data.nombre.trim()) return invalid('nombre', 'Cuéntanos tu nombre.');
       if (!data.fecha) return invalid('fecha', 'Elige la fecha del evento.');
@@ -388,12 +419,62 @@
       window.open('https://wa.me/' + WHATSAPP + '?text=' + encodeURIComponent(lines.join('\n')), '_blank', 'noopener');
     });
 
-    function invalid(id, msg) {
-      const input = document.getElementById(id);
-      input.closest('.field').classList.add('is-invalid');
+    function invalid(name, msg) {
+      const input = form.elements[name];
+      input.closest(fieldSel).classList.add('is-invalid');
       hint.textContent = msg;
       input.focus();
     }
+  }
+
+  /* ---------- Mili: la tortica asistente ---------- */
+  function setupMili() {
+    const mili = document.getElementById('mili');
+    if (!mili) return;
+    const bot = document.getElementById('miliBot');
+    const bubble = document.getElementById('miliBubble');
+    const panel = document.getElementById('miliPanel');
+    const views = panel.querySelectorAll('.mili-view');
+    const messages = ['¡Hola! ¿Pedimos tu torta? 🎂', 'Escríbeme, te ayudo 💬', '¿Qué vamos a celebrar? 🎉', 'Pide tu torta conmigo 🍒'];
+    let msgIndex = 0;
+    let bubbleTimer = null;
+
+    const isOpen = () => mili.classList.contains('is-open');
+    const showView = (name) => views.forEach((v) => v.classList.toggle('is-active', v.dataset.view === name));
+
+    function open(view) {
+      mili.classList.add('is-open');
+      bot.setAttribute('aria-expanded', 'true');
+      bubble.classList.remove('is-visible');
+      showView(view || 'home');
+    }
+    function close() {
+      if (!isOpen()) return;
+      mili.classList.remove('is-open');
+      bot.setAttribute('aria-expanded', 'false');
+      bot.focus({ preventScroll: true });
+    }
+
+    bot.addEventListener('click', () => (isOpen() ? close() : open()));
+    bubble.addEventListener('click', () => open());
+    document.getElementById('miliClose').addEventListener('click', close);
+    panel.querySelectorAll('[data-go]').forEach((b) => b.addEventListener('click', () => {
+      showView(b.dataset.go);
+      if (b.dataset.go === 'order') panel.querySelector('input[name="nombre"]').focus({ preventScroll: true });
+    }));
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+    document.addEventListener('pointerdown', (e) => { if (isOpen() && !mili.contains(e.target)) close(); });
+
+    // Globo que recuerda que puedes hablarle (el salto cada 2 s lo hace el CSS)
+    function cycleBubble() {
+      if (!isOpen() && !root.classList.contains('is-intro')) {
+        bubble.textContent = messages[msgIndex++ % messages.length];
+        bubble.classList.add('is-visible');
+        setTimeout(() => bubble.classList.remove('is-visible'), 4000);
+      }
+      bubbleTimer = setTimeout(cycleBubble, 12000);
+    }
+    bubbleTimer = setTimeout(cycleBubble, 5000);
   }
 
 })();

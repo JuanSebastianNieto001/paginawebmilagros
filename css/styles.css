@@ -363,18 +363,126 @@ em { font-style: italic; }
 .footer__script { font-family: var(--script); font-size: 34px; letter-spacing: 0; text-transform: none; color: #fff; }
 .footer__script:hover { color: var(--pink); }
 
-/* Floating WhatsApp */
-.wa-float {
-  position: fixed; right: 24px; bottom: 24px; z-index: 60;
-  width: 56px; height: 56px; border-radius: 50%;
-  display: grid; place-items: center; background: var(--plum); color: #fff;
-  border: 1px solid rgba(247,194,240,.55);
-  box-shadow: 0 16px 40px -12px rgba(72,19,61,.6);
-  opacity: 0; transform: translateY(20px) scale(.8); pointer-events: none;
-  transition: opacity .5s var(--ease), transform .5s var(--ease), background-color .3s;
+/* ================= MILI (tortica asistente) ================= */
+.mili {
+  position: fixed; right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); z-index: 70;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 12px;
+  transition: opacity .6s var(--ease), transform .6s var(--ease);
 }
-.wa-float.is-visible { opacity: 1; transform: none; pointer-events: auto; }
-.wa-float:hover { background: var(--berry); color: #fff; }
+html.is-intro .mili { opacity: 0; transform: translateY(30px); pointer-events: none; }
+
+.mili__bot {
+  position: relative; width: 84px; height: 84px; padding: 0; border: 0; background: none; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.mili__char { position: absolute; inset: 0; display: block; transform-origin: 50% 100%; animation: mili-hop 2s var(--ease) infinite; filter: drop-shadow(0 10px 14px rgba(72,19,61,.28)); }
+.mili__char svg { width: 100%; height: 100%; overflow: visible; }
+.mili__shadow { position: absolute; left: 18%; right: 18%; bottom: -2px; height: 8px; border-radius: 50%; background: rgba(72,19,61,.22); animation: mili-shadow 2s var(--ease) infinite; }
+.mili__eyes { transform-box: fill-box; transform-origin: center; animation: mili-blink 4s infinite; }
+.mili__arm { transform-box: fill-box; }
+.mili__arm--l { transform-origin: 100% 100%; animation: mili-wave-l 2s var(--ease) infinite; }
+.mili__arm--r { transform-origin: 0% 100%; animation: mili-wave-r 2s var(--ease) infinite; }
+.mili__badge {
+  position: absolute; top: 2px; right: 2px; min-width: 20px; height: 20px; padding: 0 5px; border-radius: 10px;
+  background: #25d366; color: #fff; font: 500 11px/20px var(--sans); text-align: center;
+  box-shadow: 0 0 0 3px #fff; animation: mili-pulse 2s infinite;
+}
+.mili__bot:hover .mili__char { animation-duration: 1s; }
+.mili__bot:focus-visible { outline-offset: 6px; border-radius: 50%; }
+
+/* Salta cada 2 s para recordar que puedes hablarle */
+@keyframes mili-hop {
+  0%, 55%, 100% { transform: translateY(0) scale(1, 1); }
+  62% { transform: translateY(0) scale(1.1, .88); }
+  74% { transform: translateY(-18px) scale(.94, 1.08) rotate(-4deg); }
+  84% { transform: translateY(0) scale(1.08, .92) rotate(2deg); }
+  92% { transform: translateY(0) scale(.98, 1.02); }
+}
+@keyframes mili-shadow { 0%, 55%, 100% { transform: scale(1); opacity: 1; } 74% { transform: scale(.6); opacity: .5; } 84% { transform: scale(1.1); } }
+@keyframes mili-wave-l { 0%, 60%, 100% { transform: rotate(0); } 72% { transform: rotate(18deg); } 84% { transform: rotate(-8deg); } }
+@keyframes mili-wave-r { 0%, 60%, 100% { transform: rotate(0); } 70% { transform: rotate(-30deg); } 78% { transform: rotate(10deg); } 86% { transform: rotate(-24deg); } 94% { transform: rotate(0); } }
+@keyframes mili-blink { 0%, 44%, 50%, 100% { transform: scaleY(1); } 47% { transform: scaleY(.1); } }
+@keyframes mili-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+
+.mili.is-open .mili__char, .mili.is-open .mili__arm, .mili.is-open .mili__shadow { animation: none; }
+.mili.is-open .mili__badge { display: none; }
+
+/* Globo de diálogo */
+.mili__bubble {
+  position: relative; max-width: 220px; margin-right: 8px; padding: 12px 16px;
+  background: #fff; color: var(--plum); border-radius: 16px 16px 4px 16px;
+  font: 400 14px/1.4 var(--sans); box-shadow: 0 14px 30px -12px rgba(72,19,61,.4);
+  opacity: 0; transform: translateY(8px) scale(.9); transform-origin: 100% 100%; pointer-events: none;
+  transition: opacity .4s var(--ease), transform .4s var(--ease);
+}
+.mili__bubble::after { content: ""; position: absolute; right: 18px; bottom: -6px; width: 12px; height: 12px; background: #fff; transform: rotate(45deg); border-radius: 2px; }
+.mili__bubble.is-visible { opacity: 1; transform: none; pointer-events: auto; cursor: pointer; }
+.mili.is-open .mili__bubble { display: none; }
+
+/* Panel */
+.mili-panel {
+  position: absolute; right: 0; bottom: calc(100% + 12px);
+  width: min(360px, calc(100vw - 32px)); max-height: min(620px, calc(100svh - 130px));
+  display: flex; flex-direction: column; overflow: hidden;
+  background: #fff; border-radius: 22px; box-shadow: 0 30px 70px -20px rgba(72,19,61,.5), 0 0 0 1px rgba(72,19,61,.06);
+  opacity: 0; visibility: hidden; transform: translateY(16px) scale(.96); transform-origin: 100% 100%;
+  transition: opacity .35s var(--ease), transform .35s var(--ease), visibility 0s .35s;
+}
+.mili.is-open .mili-panel { opacity: 1; visibility: visible; transform: none; transition: opacity .35s var(--ease), transform .35s var(--ease), visibility 0s; }
+.mili-panel__head { display: flex; align-items: center; gap: 12px; padding: 14px 14px 14px 16px; background: var(--plum); color: #fff; }
+.mili-panel__avatar { width: 44px; height: 44px; flex: none; background: var(--pink-2); border-radius: 50%; padding: 3px; }
+.mili-panel__head > div { flex: 1; min-width: 0; }
+.mili-panel__name { margin: 0; font-family: var(--script); font-size: 30px; line-height: 1; color: var(--pink); }
+.mili-panel__status { margin: 2px 0 0; display: flex; align-items: center; gap: 6px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--blush); }
+.mili-panel__status span { width: 7px; height: 7px; border-radius: 50%; background: #25d366; }
+.mili-panel__close { width: 36px; height: 36px; display: grid; place-items: center; border: 0; border-radius: 50%; background: rgba(255,255,255,.1); color: #fff; cursor: pointer; transition: background .3s; }
+.mili-panel__close:hover { background: rgba(255,255,255,.22); }
+.mili-panel__body { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 18px 16px 16px; background: linear-gradient(180deg, #fff6fb, #fff); }
+
+.mili-view { display: none; flex-direction: column; gap: 10px; }
+.mili-view.is-active { display: flex; animation: mili-view-in .35s var(--ease); }
+@keyframes mili-view-in { from { opacity: 0; transform: translateY(8px); } }
+.mili-msg { margin: 0; align-self: flex-start; max-width: 92%; padding: 10px 14px; background: #fff; border: 1px solid var(--line); border-radius: 4px 16px 16px 16px; font-size: 14px; line-height: 1.5; color: var(--ink); }
+.mili-msg strong { color: var(--berry); font-weight: 500; }
+
+.mili-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+.mili-action {
+  display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 14px; text-align: left;
+  border: 1px solid var(--line); border-radius: 14px; background: #fff; color: var(--plum); cursor: pointer;
+  font: 400 14px/1.3 var(--sans); transition: transform .3s var(--ease), border-color .3s, box-shadow .3s;
+}
+.mili-action:hover { color: var(--plum); transform: translateY(-2px); border-color: var(--pink-3); box-shadow: 0 10px 22px -14px rgba(72,19,61,.45); }
+.mili-action svg { width: 36px; height: 36px; flex: none; padding: 7px; border-radius: 10px; }
+.mili-action span { display: flex; flex-direction: column; }
+.mili-action strong { font-weight: 500; }
+.mili-action small { font-size: 12px; color: var(--mauve); }
+.mili-action--order { background: var(--plum); border-color: var(--plum); color: #fff; }
+.mili-action--order:hover { color: #fff; border-color: var(--plum); }
+.mili-action--order svg { background: rgba(255,255,255,.12); color: var(--pink); }
+.mili-action--order small { color: var(--blush); }
+.mili-action--wa svg { background: #25d366; color: #fff; }
+.mili-action--ig svg { background: linear-gradient(45deg, #f9ce34, #ee2a7b 50%, #6228d7); color: #fff; }
+
+.mili-back { align-self: flex-start; padding: 4px 0; border: 0; background: none; color: var(--mauve); font: 400 12px var(--sans); letter-spacing: .12em; text-transform: uppercase; cursor: pointer; }
+.mili-back:hover { color: var(--plum); }
+.mili-form { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+.mili-form__row { display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px; }
+.mili-field { display: flex; flex-direction: column; gap: 4px; }
+.mili-field span { font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--mauve); }
+.mili-field input, .mili-field textarea {
+  width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: #fff;
+  font: 400 16px var(--sans); color: var(--ink); outline: none; transition: border-color .3s, box-shadow .3s; resize: none;
+}
+.mili-field input:focus, .mili-field textarea:focus { border-color: var(--berry); box-shadow: 0 0 0 3px rgba(181,71,127,.12); }
+.mili-field.is-invalid input { border-color: #d93a5a; }
+.mili-form__hint { margin: 0; min-height: 1em; font-size: 12px; color: #d93a5a; }
+.mili-submit { height: 48px; border: 0; border-radius: 12px; background: #25d366; color: #fff; font: 500 13px var(--sans); letter-spacing: .08em; cursor: pointer; transition: background .3s, transform .3s var(--ease); }
+.mili-submit:hover { background: #1ebe5b; transform: translateY(-1px); }
+
+@media (max-width: 860px) {
+  .mili__bot { width: 72px; height: 72px; }
+  .mili__bubble { font-size: 13px; max-width: 190px; }
+}
 
 /* ================= RESPONSIVE ================= */
 @media (max-width: 1100px) {
@@ -449,6 +557,14 @@ em { font-style: italic; }
 
 @media (max-width: 860px) and (orientation: portrait) {
   .intro__video { object-fit: contain; }
+}
+
+/* Pantallas táctiles: sin efectos costosos de pintado */
+@media (hover: none), (pointer: coarse) {
+  .nav::before { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(255, 246, 252, .97); }
+  .mili__char { filter: none; }
+  .card:hover .card__media { transform: none; box-shadow: none; }
+  .card:hover .card__media .ph { transform: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
