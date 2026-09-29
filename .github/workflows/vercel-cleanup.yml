@@ -1,0 +1,63 @@
+# Limpia deploys viejos de Vercel: deja solo el actual y el anterior (para poder revertir).
+# Se ejecuta cuando Vercel reporta a GitHub que un deploy terminó con éxito.
+#
+# Secrets requeridos (GitHub → Settings → Secrets and variables → Actions):
+#   VERCEL_TOKEN       Token de https://vercel.com/account/tokens
+#   VERCEL_PROJECT_ID  Vercel → Proyecto → Settings → General → Project ID
+# Opcional:
+#   VERCEL_TEAM_ID     Solo si el proyecto está en un Team (no en la cuenta Hobby personal)
+
+name: Limpiar deploys viejos de Vercel
+
+on:
+  deployment_status:
+  workflow_dispatch:
+
+concurrency:
+  group: vercel-cleanup
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    if: github.event_name == 'workflow_dispatch' || github.event.deployment_status.state == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Borrar deploys excepto los 2 más recientes
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_TEAM_ID: ${{ secrets.VERCEL_TEAM_ID }}
+          KEEP: '2'
+        run: |
+          node <<'EOF'
+          const { VERCEL_TOKEN, VERCEL_PROJECT_ID, VERCEL_TEAM_ID } = process.env;
+          const KEEP = Number(process.env.KEEP);
+          if (!VERCEL_TOKEN || !VERCEL_PROJECT_ID) {
+            console.error('Faltan los secrets VERCEL_TOKEN y/o VERCEL_PROJECT_ID.');
+            process.exit(1);
+          }
+          const team = VERCEL_TEAM_ID ? '&teamId=' + VERCEL_TEAM_ID : '';
+          const headers = { Authorization: 'Bearer ' + VERCEL_TOKEN };
+
+          (async () => {
+            const res = await fetch(`https://api.vercel.com/v6/deployments?projectId=${VERCEL_PROJECT_ID}&limit=100${team}`, { headers });
+            if (!res.ok) throw new Error('No se pudo listar: ' + res.status + ' ' + await res.text());
+            const { deployments } = await res.json();
+
+            // Nunca tocar deploys que aún se están construyendo.
+            const finished = deployments
+              .filter((d) => ['READY', 'ERROR', 'CANCELED'].includes(d.state || d.readyState))
+              .sort((a, b) => b.created - a.created);
+
+            // Conservar los KEEP deploys exitosos más recientes; borrar todo lo demás terminado.
+            const keep = new Set(finished.filter((d) => (d.state || d.readyState) === 'READY').slice(0, KEEP).map((d) => d.uid));
+            const toDelete = finished.filter((d) => !keep.has(d.uid));
+
+            console.log('Se conservan:', [...keep].join(', ') || '(ninguno)');
+            for (const d of toDelete) {
+              const del = await fetch(`https://api.vercel.com/v13/deployments/${d.uid}?${team.slice(1)}`, { method: 'DELETE', headers });
+              console.log((del.ok ? 'Borrado ' : 'Error al borrar ') + d.uid + ' (' + d.url + ', ' + new Date(d.created).toISOString() + ')');
+            }
+            console.log(`Listo: ${toDelete.length} deploy(s) borrado(s).`);
+          })().catch((e) => { console.error(e); process.exit(1); });
+          EOF
