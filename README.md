@@ -16,8 +16,7 @@ design/                 Export original del diseño (referencia)
 ## Qué incluye
 
 - **Intro en video** a pantalla completa cada vez que se carga o recarga la página.
-  Al terminar, el último cuadro se acerca y se desenfoca, sube una cortina ciruela por columnas y se abre mostrando la web.
-  El botón "Entrar" (o las teclas Enter / Esc) salta la intro.
+  Al terminar, en poco más de un segundo el último cuadro se desenfoca, sube una cortina ciruela por columnas y se abre mostrando la web.
 - **Siempre arranca arriba**: al recargar, la página vuelve al hero aunque antes estuvieras más abajo o hubiera un `#ancla` en la URL.
 - **Animaciones**: títulos que suben línea por línea, manifiesto que se ilumina al leer, tarjetas con entrada escalonada e inclinación 3D al pasar el mouse, cinta infinita que reacciona al scroll, parallax de ornamentos florales, botones magnéticos.
 - **"Así nace tu torta"**: escena fija en la que la torta se arma capa por capa mientras haces scroll.

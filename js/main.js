@@ -44,7 +44,6 @@
   /* ---------- Intro ---------- */
   const intro = document.getElementById('intro');
   const video = document.getElementById('introVideo');
-  const skip = document.getElementById('skipIntro');
   const progress = intro.querySelector('.intro__progress span');
   let introFinished = false;
 
@@ -68,21 +67,20 @@
     const cols = intro.querySelectorAll('.intro__curtain span');
     const tl = gsap.timeline({ defaults: { ease: 'power3.inOut' } });
 
-    tl.to(skip, { autoAlpha: 0, duration: 0.3 }, 0)
-      .to(intro.querySelector('.intro__progress'), { autoAlpha: 0, duration: 0.3 }, 0)
-      // 1. El último cuadro (logo) respira: se acerca y se desenfoca en rosa
-      .to(video, { scale: 1.12, filter: 'blur(8px) saturate(1.15)', duration: 1.4, ease: 'power2.inOut' }, 0.15)
-      .to(intro.querySelector('.intro__veil'), { opacity: 1, duration: 1.2 }, 0.15)
+    tl.to(intro.querySelector('.intro__progress'), { autoAlpha: 0, duration: 0.2 }, 0)
+      // 1. El último cuadro (logo) se acerca y se desenfoca en rosa
+      .to(video, { scale: 1.08, filter: 'blur(6px) saturate(1.15)', duration: 0.6, ease: 'power2.in' }, 0)
+      .to(intro.querySelector('.intro__veil'), { opacity: 1, duration: 0.5 }, 0)
       // 2. Cortina ciruela que sube por columnas desde el centro
-      .to(cols, { scaleY: 1, duration: 0.8, stagger: { each: 0.07, from: 'center' } }, 0.9)
+      .to(cols, { scaleY: 1, duration: 0.45, stagger: { each: 0.04, from: 'center' } }, 0.2)
       .set([video, intro.querySelector('.intro__veil')], { autoAlpha: 0 })
       .set(intro, { backgroundColor: 'transparent' })
-      .add(() => { tl.pause(); fontsReady.then(() => { heroReveal(); tl.resume(); }); }, '+=0.05')
+      .add(() => { tl.pause(); fontsReady.then(() => { heroReveal(); tl.resume(); }); })
       // 3. La cortina se abre hacia arriba revelando la web
       .set(cols, { transformOrigin: 'top' })
-      .to(cols, { scaleY: 0, duration: 0.95, stagger: { each: 0.07, from: 'edges' }, ease: 'power4.inOut' })
-      .fromTo('#page', { scale: 1.04, filter: 'blur(4px)' }, { scale: 1, filter: 'blur(0px)', duration: 1.3, ease: 'power3.out', clearProps: 'transform,filter' }, '<')
-      .add(unlockPage, '-=0.6');
+      .to(cols, { scaleY: 0, duration: 0.55, stagger: { each: 0.04, from: 'edges' }, ease: 'power3.inOut' })
+      .fromTo('#page', { scale: 1.03, filter: 'blur(3px)' }, { scale: 1, filter: 'blur(0px)', duration: 0.8, ease: 'power3.out', clearProps: 'transform,filter' }, '<')
+      .add(unlockPage, '-=0.4');
   }
 
   // Tiempo máximo de seguridad por si el video no carga
@@ -97,7 +95,6 @@
   });
   video.addEventListener('ended', () => { progress.style.transform = 'scaleX(1)'; finishIntro(); });
   video.addEventListener('error', () => setTimeout(finishIntro, 600));
-  skip.addEventListener('click', finishIntro);
   document.addEventListener('keydown', (e) => { if (!introFinished && (e.key === 'Escape' || e.key === 'Enter')) finishIntro(); });
 
   // Reiniciar el video desde cero en cada carga
@@ -125,24 +122,24 @@
 
   function heroReveal() {
     const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
-    tl.to('.topbar, .nav', { autoAlpha: 1, y: 0, duration: 1, stagger: 0.1, clearProps: 'transform,opacity,visibility' }, 0.2);
+    tl.to('.topbar, .nav', { autoAlpha: 1, y: 0, duration: 0.7, stagger: 0.06, clearProps: 'transform,opacity,visibility' }, 0.1);
     if (canSplit) {
       const split = new SplitType(heroTitle, { types: 'lines,words', lineClass: 'split-line' });
       tl.set(heroTitle, { autoAlpha: 1 }, 0)
         .fromTo(split.words, { yPercent: 115 }, {
-          yPercent: 0, duration: 1.3, stagger: 0.06,
+          yPercent: 0, duration: 0.9, stagger: 0.04,
           onComplete: () => split.revert()
-        }, 0.3);
+        }, 0.1);
     } else {
-      tl.fromTo(heroTitle, { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 1.2 }, 0.3);
+      tl.fromTo(heroTitle, { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 0.8 }, 0.1);
     }
-    tl.to('.hero__eyebrow', { autoAlpha: 1, y: 0, duration: 1 }, 0.2)
-      .to('.hero__script, .hero__actions', { autoAlpha: 1, y: 0, duration: 1.1, stagger: 0.12 }, 0.8)
-      .to('[data-hero-media]', { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.6, ease: 'expo.inOut' }, 0.9)
-      .to('.hero__cue', { autoAlpha: 1, y: 0, duration: 0.9 }, 1.4)
-      .to('.hero__meta', { autoAlpha: 1, y: 0, duration: 0.9 }, 1.8)
-      .to('.ornament--hero-l', { autoAlpha: 0.2, duration: 2 }, 1)
-      .to('.ornament--hero-r', { autoAlpha: 0.18, duration: 2 }, 1.2);
+    tl.to('.hero__eyebrow', { autoAlpha: 1, y: 0, duration: 0.7 }, 0.05)
+      .to('.hero__script, .hero__actions', { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.08 }, 0.4)
+      .to('[data-hero-media]', { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.1, ease: 'expo.inOut' }, 0.5)
+      .to('.hero__cue', { autoAlpha: 1, y: 0, duration: 0.6 }, 0.8)
+      .to('.hero__meta', { autoAlpha: 1, y: 0, duration: 0.6 }, 1)
+      .to('.ornament--hero-l', { autoAlpha: 0.2, duration: 1.2 }, 0.5)
+      .to('.ornament--hero-r', { autoAlpha: 0.18, duration: 1.2 }, 0.6);
   }
 
   setupBasics();

@@ -73,13 +73,6 @@ em { font-style: italic; }
   width: min(220px, 50vw); height: 1px; background: rgba(72,19,61,.15); z-index: 3;
 }
 .intro__progress span { display: block; height: 100%; width: 100%; background: var(--berry); transform-origin: left; transform: scaleX(0); }
-.intro__skip {
-  position: absolute; right: 28px; bottom: 22px; z-index: 3;
-  background: rgba(255,255,255,.4); border: 1px solid rgba(72,19,61,.3); color: var(--plum);
-  font: 400 11px/1 var(--sans); letter-spacing: .28em; text-transform: uppercase;
-  padding: 12px 18px; cursor: pointer; transition: background .3s, color .3s, border-color .3s;
-}
-.intro__skip:hover { background: var(--plum); color: #fff; border-color: var(--plum); }
 .intro__curtain { position: absolute; inset: 0; z-index: 4; display: flex; pointer-events: none; }
 .intro__curtain span { flex: 1; height: 100%; background: var(--plum); transform: scaleY(0); transform-origin: bottom; }
 .intro__curtain span:nth-child(even) { background: #5e1f50; }
@@ -451,7 +444,6 @@ em { font-style: italic; }
   .form__row { grid-template-columns: 1fr; }
   .footer { flex-direction: column; text-align: center; }
   .ornament { width: 260px; height: 420px; }
-  .intro__skip { right: 16px; bottom: 16px; }
   .intro__progress { bottom: 70px; }
 }
 
