@@ -77,7 +77,7 @@
       .to(cols, { scaleY: 1, duration: 0.8, stagger: { each: 0.07, from: 'center' } }, 0.9)
       .set([video, intro.querySelector('.intro__veil')], { autoAlpha: 0 })
       .set(intro, { backgroundColor: 'transparent' })
-      .add(() => { heroReveal(); }, '+=0.05')
+      .add(() => { tl.pause(); fontsReady.then(() => { heroReveal(); tl.resume(); }); }, '+=0.05')
       // 3. La cortina se abre hacia arriba revelando la web
       .set(cols, { transformOrigin: 'top' })
       .to(cols, { scaleY: 0, duration: 0.95, stagger: { each: 0.07, from: 'edges' }, ease: 'power4.inOut' })
@@ -113,32 +113,33 @@
 
   /* ---------- Estado inicial del hero (oculto tras la intro) ---------- */
   const heroTitle = document.querySelector('.hero__title');
-  let heroSplit = null;
-  if (canSplit) {
-    heroSplit = new SplitType(heroTitle, { types: 'lines,words', lineClass: 'split-line' });
-    gsap.set(heroSplit.words, { yPercent: 115 });
-  } else {
-    gsap.set(heroTitle, { autoAlpha: 0, y: 40 });
-  }
+  // El título se divide en líneas justo antes de animarlo (con las fuentes ya cargadas),
+  // para que las líneas coincidan con el texto final y no haya saltos al terminar.
+  gsap.set(heroTitle, { autoAlpha: 0 });
   gsap.set('[data-hero]', { autoAlpha: 0, y: 30 });
   gsap.set('[data-hero-media]', { clipPath: 'inset(100% 0% 0% 0%)' });
   gsap.set('.nav, .topbar', { autoAlpha: 0, y: -20 });
   gsap.set('.ornament--hero-l, .ornament--hero-r', { autoAlpha: 0 });
 
+  const fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+
   function heroReveal() {
     const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
     tl.to('.topbar, .nav', { autoAlpha: 1, y: 0, duration: 1, stagger: 0.1, clearProps: 'transform,opacity,visibility' }, 0.2);
-    if (heroSplit) {
-      tl.to(heroSplit.words, {
-        yPercent: 0, duration: 1.3, stagger: 0.06,
-        onComplete: () => { heroSplit.revert(); }
-      }, 0.3);
+    if (canSplit) {
+      const split = new SplitType(heroTitle, { types: 'lines,words', lineClass: 'split-line' });
+      tl.set(heroTitle, { autoAlpha: 1 }, 0)
+        .fromTo(split.words, { yPercent: 115 }, {
+          yPercent: 0, duration: 1.3, stagger: 0.06,
+          onComplete: () => split.revert()
+        }, 0.3);
     } else {
-      tl.to(heroTitle, { autoAlpha: 1, y: 0, duration: 1.2 }, 0.3);
+      tl.fromTo(heroTitle, { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 1.2 }, 0.3);
     }
     tl.to('.hero__eyebrow', { autoAlpha: 1, y: 0, duration: 1 }, 0.2)
       .to('.hero__script, .hero__actions', { autoAlpha: 1, y: 0, duration: 1.1, stagger: 0.12 }, 0.8)
       .to('[data-hero-media]', { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.6, ease: 'expo.inOut' }, 0.9)
+      .to('.hero__cue', { autoAlpha: 1, y: 0, duration: 0.9 }, 1.4)
       .to('.hero__meta', { autoAlpha: 1, y: 0, duration: 0.9 }, 1.8)
       .to('.ornament--hero-l', { autoAlpha: 0.2, duration: 2 }, 1)
       .to('.ornament--hero-r', { autoAlpha: 0.18, duration: 2 }, 1.2);
