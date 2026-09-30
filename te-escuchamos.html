@@ -4,6 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Te escuchamos — Milagros Tortas Temáticas</title>
+  <script>
+    /* Al recargar esta vista se vuelve a la portada (con su intro) */
+    (function () { var n = performance.getEntriesByType && performance.getEntriesByType("navigation")[0]; if (n && n.type === "reload") location.replace("index.html"); })();
+  </script>
   <meta name="description" content="Envíanos tus sugerencias, comentarios y felicitaciones. En Milagros Tortas Temáticas leemos cada mensaje.">
   <meta name="theme-color" content="#48133d">
   <link rel="icon" type="image/png" href="assets/img/logo-milagros.png">

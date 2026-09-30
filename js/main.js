@@ -133,7 +133,7 @@
       // 2. Cortina ciruela que sube por columnas desde el centro
       .to(cols, { scaleY: 1, duration: 0.45, stagger: { each: 0.04, from: 'center' } }, 0.2)
       .set([video, intro.querySelector('.intro__veil')], { autoAlpha: 0 })
-      .set(intro, { backgroundColor: 'transparent' })
+      .set(intro, { background: 'none' })
       .add(() => { tl.pause(); fontsReady.then(() => { heroReveal(); tl.resume(); }); })
       // 3. La cortina se abre hacia arriba revelando la web
       .set(cols, { transformOrigin: 'top' })
