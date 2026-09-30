@@ -122,12 +122,32 @@ em { font-style: italic; }
 
 .nav__right { display: flex; align-items: center; gap: 20px; }
 .nav__rule { width: clamp(60px, 14vw, 200px); height: 1px; background: var(--plum); }
-.nav__toggle {
-  width: 92px; height: 40px; border-radius: 999px; background: var(--plum); padding: 4px;
-  display: flex; align-items: center; box-shadow: 0 10px 20px rgba(72,19,61,.3);
+/* Botón de WhatsApp: rosado, y al pasar el mouse se vuelve verde */
+.nav__wa {
+  --wa-bg: var(--pink); --wa-knob: var(--plum); --wa-icon: #fff; --wa-text: var(--plum);
+  position: relative; display: flex; align-items: center; gap: 10px; height: 44px; padding: 4px 18px 4px 4px;
+  border-radius: 999px; background: var(--wa-bg); color: var(--wa-text);
+  box-shadow: 0 10px 20px rgba(72,19,61,.25);
+  transition: background-color .45s var(--ease), color .45s var(--ease), box-shadow .45s var(--ease), transform .45s var(--ease);
 }
-.nav__toggle span { width: 32px; height: 32px; border-radius: 999px; background: radial-gradient(circle at 35% 30%, #ffffff 0%, #f7c2f0 45%, #e39fd6 100%); transform: translateX(52px); transition: transform .5s var(--ease); }
-.nav__toggle:hover span { transform: translateX(0); }
+.nav__wa::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; border: 2px solid #25d366;
+  opacity: 0; transform: scale(1); pointer-events: none;
+}
+.nav__wa-knob {
+  width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; flex: none;
+  background: var(--wa-knob); color: var(--wa-icon);
+  transition: background-color .45s var(--ease), color .45s var(--ease), transform .55s var(--ease);
+}
+.nav__wa-knob svg { width: 20px; height: 20px; }
+.nav__wa-text { font-size: 19px; font-weight: 600; line-height: 1; white-space: nowrap; }
+.nav__wa:hover, .nav__wa:focus-visible {
+  --wa-bg: #25d366; --wa-knob: #fff; --wa-icon: #25d366; --wa-text: #fff;
+  color: #fff; box-shadow: 0 12px 26px rgba(37,211,102,.45); transform: translateY(-2px);
+}
+.nav__wa:hover .nav__wa-knob { transform: rotate(-12deg) scale(1.08); }
+.nav__wa:hover::before { animation: wa-ping .9s var(--ease); }
+@keyframes wa-ping { 0% { opacity: .8; transform: scale(1); } 100% { opacity: 0; transform: scale(1.35); } }
 .nav__burger { display: none; }
 
 /* ================= TABLERO ================= */
@@ -511,8 +531,12 @@ html.is-intro .mili { opacity: 0; transform: translateY(30px); pointer-events: n
 
 /* ================= CELULAR / TABLET (flujo apilado) ================= */
 @media (max-width: 1000px) {
-  .nav { height: 72px; padding: 0 20px; }
-  .nav__right { display: none; }
+  .nav { height: 72px; padding: 0 16px 0 20px; gap: 12px; }
+  .nav__rule { display: none; }
+  .nav__right { margin-left: auto; }
+  .nav__wa { height: 40px; padding: 3px 14px 3px 3px; gap: 8px; }
+  .nav__wa-knob { width: 34px; height: 34px; }
+  .nav__wa-text { font-size: 17px; }
   .brand img { width: 44px; height: 42px; }
   .brand__script { font-size: 26px; }
   .nav__burger {
