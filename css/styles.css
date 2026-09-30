@@ -253,7 +253,7 @@ em { font-style: italic; }
 .fly.is-flying, .fly:hover { --flap: .32s; }
 @keyframes flap-l { 0%, 100% { transform: rotateY(-6deg); } 50% { transform: rotateY(62deg); } }
 @keyframes flap-r { 0%, 100% { transform: rotateY(6deg); } 50% { transform: rotateY(-62deg); } }
-.fly--hero { top: 60px; left: 10px; width: 300px; height: 254px; --rot: -14deg; }
+.fly--hero { z-index: 5; top: 60px; left: 10px; width: 300px; height: 254px; --rot: -14deg; }
 .fly--small { top: 30px; left: 1230px; width: 170px; height: 144px; --rot: 18deg; --flip: -1; }
 
 /* Jarrones: cada uno recortado del mismo PNG para que se muevan a su ritmo */
