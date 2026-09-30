@@ -60,10 +60,13 @@
   const progress = intro.querySelector('.intro__progress span');
   let introFinished = false;
 
-  function unlockPage() {
-    root.classList.remove('is-intro');
+  function hideIntro() {
     intro.classList.add('is-done');
     intro.setAttribute('aria-hidden', 'true');
+  }
+
+  function unlockPage() {
+    root.classList.remove('is-intro');
     window.scrollTo(0, 0);
     if (lenis) { lenis.scrollTo(0, { immediate: true }); lenis.start(); }
     if (hasGsap) ScrollTrigger.refresh();
@@ -75,7 +78,7 @@
     clearTimeout(safety);
     video.pause();
 
-    if (!hasGsap) { unlockPage(); return; }
+    if (!hasGsap) { unlockPage(); hideIntro(); return; }
 
     const cols = intro.querySelectorAll('.intro__curtain span');
     const tl = gsap.timeline({ defaults: { ease: 'power3.inOut' } });
@@ -93,8 +96,9 @@
       .add(() => { tl.pause(); fontsReady.then(() => { heroReveal(); tl.resume(); }); })
       // 3. La cortina se abre hacia arriba revelando la web
       .set(cols, { transformOrigin: 'top' })
-      .to(cols, { scaleY: 0, duration: 0.55, stagger: { each: 0.04, from: 'edges' }, ease: 'power3.inOut' })
-      .add(unlockPage, '-=0.4');
+      .to(cols, { scaleY: 0, duration: 0.8, stagger: { each: 0.06, from: 'edges' }, ease: 'power3.inOut' })
+      .add(unlockPage, '-=0.5')
+      .add(hideIntro);
   }
 
   let safety = setTimeout(finishIntro, 9000);
@@ -134,7 +138,7 @@
   gsap.set('.hero .line--v, .hero__thread', { scaleY: 0 });
   gsap.set('.hero__band', { scaleX: 0, transformOrigin: 'left center' });
   gsap.set('.hero__washi', { autoAlpha: 0 });
-  gsap.set(heroFly, { autoAlpha: 0, x: -140, y: 60, rotation: -14 });
+  gsap.set(heroFly, { autoAlpha: 0, x: -140, y: 60 });
 
   function heroReveal() {
     const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
@@ -145,7 +149,7 @@
       .to('[data-hero="arch"]', { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.2, ease: 'expo.inOut' }, 0.15)
       .to('[data-hero="tag"]', { autoAlpha: 1, duration: 0.6, stagger: 0.12 }, 0.4)
       .to('[data-hero="note"]', { autoAlpha: 1, y: 0, rotation: -1.5, duration: 1.1, ease: 'back.out(1.4)' }, 0.55)
-      .to(heroFly, { autoAlpha: 1, x: 0, y: 0, duration: 1.4, ease: 'power3.out' }, 0.5)
+      .to(heroFly, { autoAlpha: 1, x: 0, y: 0, duration: 1.4, ease: 'power3.out', onComplete: () => setupButterflies.floatHero && setupButterflies.floatHero() }, 0.5)
       .to('[data-hero="plum"]', { autoAlpha: 1, y: 0, duration: 1 }, 0.8)
       .to('[data-hero="flowers"]', { autoAlpha: 1, scale: 1, duration: 1.2, ease: 'back.out(1.2)' }, 1)
       .to('[data-hero="script"], .hero__pin, .hero__sp1, .hero__sp2, .hero__washi', { autoAlpha: 1, duration: 0.7, stagger: 0.06 }, 1.1);
@@ -225,13 +229,15 @@
   function setupButterflies() {
     // Aleteo lento en reposo: el vuelo lo hace GSAP; el aleteo, el CSS
     const flies = gsap.utils.toArray('[data-fly]');
-    flies.forEach((fly) => {
-      const base = fly.dataset.fly === 'hero' ? { rotation: -14, scaleX: 1 } : { rotation: 18, scaleX: -1 };
-      if (fly !== heroFly) gsap.set(fly, base);
-      // Flota describiendo un pequeño ocho
-      gsap.to(fly, { y: '+=14', duration: 2.6, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: 1.6 });
-      gsap.to(fly, { x: '+=10', rotation: base.rotation + 5, duration: 3.4, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: 1.6 });
-    });
+    // El flotado se aplica a la capa interna (.fly__body) para no chocar con la entrada
+    // ni con el vuelo del scroll, que mueven la capa externa (.fly).
+    const float = (fly) => {
+      const body = fly.querySelector('.fly__body');
+      gsap.to(body, { y: 14, duration: 2.6, ease: 'sine.inOut', repeat: -1, yoyo: true });
+      gsap.to(body, { x: 10, rotation: 5, duration: 3.4, ease: 'sine.inOut', repeat: -1, yoyo: true });
+    };
+    flies.forEach((fly) => { if (fly !== heroFly) float(fly); });
+    setupButterflies.floatHero = () => float(heroFly);
 
     // La mariposa del hero vuela hacia arriba y a la derecha mientras bajas
     if (heroFly && !lite) {
