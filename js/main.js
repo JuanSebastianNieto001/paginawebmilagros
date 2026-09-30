@@ -6,20 +6,30 @@
   'use strict';
 
   const WHATSAPP = '573176476868';
+  const BOARD_W = 1440;
   const root = document.documentElement;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const hasGsap = typeof window.gsap !== 'undefined' && typeof window.ScrollTrigger !== 'undefined';
-  // En celulares/tablets se evitan efectos costosos (blur, clip-path animado) para que todo vaya fluido.
-  const lite = window.matchMedia('(hover: none), (pointer: coarse)').matches || window.innerWidth <= 860;
+  // En celulares/tablets se evitan efectos costosos para que todo vaya fluido.
+  const lite = window.matchMedia('(hover: none), (pointer: coarse)').matches || window.innerWidth <= 1000;
   const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  const isMobileLayout = () => window.innerWidth <= 1000;
 
   /* ---------- Siempre arrancar arriba en cada recarga ---------- */
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
   if (location.hash) history.replaceState(null, '', location.pathname + location.search);
   window.scrollTo(0, 0);
   window.addEventListener('beforeunload', () => window.scrollTo(0, 0));
-  // Si el navegador restaura la página desde caché (atrás/adelante), recargar para ver la intro.
   window.addEventListener('pageshow', (e) => { if (e.persisted) location.reload(); });
+
+  /* ---------- Escala del tablero (lienzo de 1440px) ---------- */
+  const boardWrap = document.getElementById('boardWrap');
+  function fitBoard() {
+    const s = isMobileLayout() ? 1 : Math.min(1.2, window.innerWidth / BOARD_W);
+    boardWrap.style.setProperty('--s', s.toFixed(4));
+  }
+  fitBoard();
+  window.addEventListener('resize', () => { fitBoard(); if (hasGsap) ScrollTrigger.refresh(); });
 
   /* ---------- Smooth scroll (Lenis) ---------- */
   let lenis = null;
@@ -39,7 +49,7 @@
   const scrollToTarget = (target) => {
     const el = typeof target === 'string' ? document.querySelector(target) : target;
     if (!el) return;
-    const offset = window.innerWidth <= 860 ? -64 : -72;
+    const offset = isMobileLayout() ? -72 : -90;
     if (lenis) lenis.scrollTo(el, { offset, duration: 1.4 });
     else window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY + offset, behavior: reduceMotion ? 'auto' : 'smooth' });
   };
@@ -84,13 +94,10 @@
       // 3. La cortina se abre hacia arriba revelando la web
       .set(cols, { transformOrigin: 'top' })
       .to(cols, { scaleY: 0, duration: 0.55, stagger: { each: 0.04, from: 'edges' }, ease: 'power3.inOut' })
-      .fromTo('.hero__intro', { scale: 1.04 }, { scale: 1, duration: 0.8, ease: 'power3.out', clearProps: 'transform' }, '<')
       .add(unlockPage, '-=0.4');
   }
 
-  // Tiempo máximo de seguridad por si el video no carga
   let safety = setTimeout(finishIntro, 9000);
-
   video.addEventListener('loadedmetadata', () => {
     clearTimeout(safety);
     safety = setTimeout(finishIntro, (video.duration || 6) * 1000 + 4000);
@@ -102,7 +109,6 @@
   video.addEventListener('error', () => setTimeout(finishIntro, 600));
   document.addEventListener('keydown', (e) => { if (!introFinished && (e.key === 'Escape' || e.key === 'Enter')) finishIntro(); });
 
-  // Reiniciar el video desde cero en cada carga
   video.currentTime = 0;
   const playAttempt = video.play();
   if (playAttempt && playAttempt.catch) playAttempt.catch(() => setTimeout(finishIntro, 900));
@@ -112,194 +118,184 @@
 
   gsap.registerPlugin(ScrollTrigger);
   const canSplit = typeof window.SplitType !== 'undefined';
+  const fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
 
   /* ---------- Estado inicial del hero (oculto tras la intro) ---------- */
   const heroTitle = document.querySelector('.hero__title');
-  // El título se divide en líneas justo antes de animarlo (con las fuentes ya cargadas),
-  // para que las líneas coincidan con el texto final y no haya saltos al terminar.
+  const heroFly = document.querySelector('[data-fly="hero"]');
+  gsap.set('.nav', { autoAlpha: 0, y: -20 });
   gsap.set(heroTitle, { autoAlpha: 0 });
-  gsap.set('[data-hero]', { autoAlpha: 0, y: 30 });
-  gsap.set('[data-hero-media]', { clipPath: 'inset(100% 0% 0% 0%)' });
-  gsap.set('.nav, .topbar', { autoAlpha: 0, y: -20 });
-  gsap.set('.ornament--hero-l, .ornament--hero-r', { autoAlpha: 0 });
-
-  const fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+  gsap.set('[data-hero="tag"], [data-hero="script"], .hero__pin, .hero__sp1, .hero__sp2', { autoAlpha: 0 });
+  gsap.set('[data-hero="note"]', { autoAlpha: 0, y: -60, rotation: -8 });
+  gsap.set('[data-hero="plum"]', { autoAlpha: 0, y: 50 });
+  gsap.set('[data-hero="arch"]', { clipPath: 'inset(100% 0% 0% 0%)' });
+  gsap.set('[data-hero="flowers"]', { autoAlpha: 0, scale: 0.6, transformOrigin: '50% 100%' });
+  gsap.set('.hero .line--h', { scaleX: 0 });
+  gsap.set('.hero .line--v, .hero__thread', { scaleY: 0 });
+  gsap.set('.hero__band', { scaleX: 0, transformOrigin: 'left center' });
+  gsap.set('.hero__washi', { autoAlpha: 0 });
+  gsap.set(heroFly, { autoAlpha: 0, x: -140, y: 60, rotation: -14 });
 
   function heroReveal() {
     const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
-    tl.to('.topbar, .nav', { autoAlpha: 1, y: 0, duration: 0.7, stagger: 0.06, clearProps: 'transform,opacity,visibility' }, 0.1);
+    tl.to('.nav', { autoAlpha: 1, y: 0, duration: 0.7, clearProps: 'transform,opacity,visibility' }, 0.1)
+      .to('.hero__band', { scaleX: 1, duration: 1, ease: 'expo.inOut' }, 0.1)
+      .to('.hero .line--h', { scaleX: 1, duration: 1.1, ease: 'expo.inOut', stagger: 0.08 }, 0.2)
+      .to('.hero .line--v, .hero__thread', { scaleY: 1, duration: 1.1, ease: 'expo.inOut', stagger: 0.08 }, 0.3)
+      .to('[data-hero="arch"]', { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.2, ease: 'expo.inOut' }, 0.15)
+      .to('[data-hero="tag"]', { autoAlpha: 1, duration: 0.6, stagger: 0.12 }, 0.4)
+      .to('[data-hero="note"]', { autoAlpha: 1, y: 0, rotation: -1.5, duration: 1.1, ease: 'back.out(1.4)' }, 0.55)
+      .to(heroFly, { autoAlpha: 1, x: 0, y: 0, duration: 1.4, ease: 'power3.out' }, 0.5)
+      .to('[data-hero="plum"]', { autoAlpha: 1, y: 0, duration: 1 }, 0.8)
+      .to('[data-hero="flowers"]', { autoAlpha: 1, scale: 1, duration: 1.2, ease: 'back.out(1.2)' }, 1)
+      .to('[data-hero="script"], .hero__pin, .hero__sp1, .hero__sp2, .hero__washi', { autoAlpha: 1, duration: 0.7, stagger: 0.06 }, 1.1);
+
     if (canSplit) {
       const split = new SplitType(heroTitle, { types: 'lines,words', lineClass: 'split-line' });
-      tl.set(heroTitle, { autoAlpha: 1 }, 0)
-        .fromTo(split.words, { yPercent: 115 }, {
-          yPercent: 0, duration: 0.9, stagger: 0.04,
-          onComplete: () => split.revert()
-        }, 0.1);
+      tl.set(heroTitle, { autoAlpha: 1 }, 0.6)
+        .fromTo(split.words, { yPercent: 115 }, { yPercent: 0, duration: 1, stagger: 0.05, onComplete: () => split.revert() }, 0.65);
     } else {
-      tl.fromTo(heroTitle, { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 0.8 }, 0.1);
+      tl.fromTo(heroTitle, { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 0.9 }, 0.6);
     }
-    tl.to('.hero__eyebrow', { autoAlpha: 1, y: 0, duration: 0.7 }, 0.05)
-      .to('.hero__script, .hero__actions', { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.08 }, 0.4)
-      .to('[data-hero-media]', { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.1, ease: 'expo.inOut' }, 0.5)
-      .to('.hero__cue', { autoAlpha: 1, y: 0, duration: 0.6 }, 0.8)
-      .to('.hero__meta', { autoAlpha: 1, y: 0, duration: 0.6 }, 1)
-      .to('.ornament--hero-l', { autoAlpha: 0.2, duration: 1.2 }, 0.5)
-      .to('.ornament--hero-r', { autoAlpha: 0.18, duration: 1.2 }, 0.6);
   }
 
   setupBasics();
 
   if (reduceMotion) return;
 
-  /* ---------- Títulos: líneas que suben ---------- */
+  /* ---------- Títulos: palabras que suben ---------- */
   document.querySelectorAll('[data-split]').forEach((el) => {
-    if (el === heroTitle) return;
     if (!canSplit) {
-      gsap.from(el, { autoAlpha: 0, y: 40, duration: 1.1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 85%' } });
+      gsap.from(el, { autoAlpha: 0, y: 40, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%' } });
       return;
     }
-    const split = new SplitType(el, { types: 'lines,words', lineClass: 'split-line' });
-    gsap.from(split.words, {
-      yPercent: 115, duration: 1.2, ease: 'power4.out', stagger: 0.05,
-      scrollTrigger: { trigger: el, start: 'top 85%' },
-      onComplete: () => split.revert()
+    fontsReady.then(() => {
+      const split = new SplitType(el, { types: 'lines,words', lineClass: 'split-line' });
+      gsap.from(split.words, {
+        yPercent: 115, duration: 1, ease: 'power4.out', stagger: 0.04,
+        scrollTrigger: { trigger: el, start: 'top 88%' },
+        onComplete: () => split.revert()
+      });
     });
   });
 
   /* ---------- Reveals genéricos ---------- */
   gsap.utils.toArray('[data-reveal]').forEach((el) => {
-    gsap.from(el, { autoAlpha: 0, y: 36, duration: 1.1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%' } });
+    gsap.from(el, { autoAlpha: 0, y: 36, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 90%' } });
   });
 
-  /* ---------- Manifiesto: las palabras se iluminan al leer ---------- */
-  const quote = document.querySelector('[data-words]');
-  if (quote && canSplit) {
-    const qs = new SplitType(quote, { types: 'words', wordClass: 'word' });
-    gsap.to(qs.words, {
-      opacity: 1, stagger: 0.1, ease: 'none',
-      scrollTrigger: { trigger: quote, start: 'top 80%', end: 'bottom 45%', scrub: true }
-    });
-  }
-  gsap.from('.manifesto__line', { scaleX: 0, duration: 1.6, ease: 'expo.out', scrollTrigger: { trigger: '.manifesto', start: 'top 80%' } });
+  /* ---------- Papeles que caen sobre el tablero ---------- */
+  gsap.utils.toArray('[data-drop]').forEach((el, i) => {
+    if (el.dataset.hero) return; // los del hero los maneja heroReveal
+    const rot = parseFloat(el.dataset.rot) || 0;
+    gsap.fromTo(el,
+      { autoAlpha: 0, y: -50, rotation: rot + (i % 2 ? 7 : -7) },
+      { autoAlpha: 1, y: 0, rotation: rot, duration: 1.1, ease: 'back.out(1.3)', scrollTrigger: { trigger: el, start: 'top 90%' } });
+  });
+
+  /* ---------- Líneas y bandas que se dibujan ---------- */
+  gsap.utils.toArray('.board > section:not(.hero) .line--h').forEach((el) => {
+    gsap.from(el, { scaleX: 0, duration: 1.4, ease: 'expo.inOut', scrollTrigger: { trigger: el, start: 'top 92%' } });
+  });
+  gsap.from('.pedir__band', { scaleX: 0, transformOrigin: 'left center', duration: 1.2, ease: 'expo.inOut', scrollTrigger: { trigger: '.pedir', start: 'top 75%' } });
+
+  /* ---------- Chinches y destellos ---------- */
+  gsap.utils.toArray('[data-pin]').forEach((el) => {
+    gsap.from(el, { scale: 0, duration: 0.7, ease: 'back.out(2)', scrollTrigger: { trigger: el, start: 'top 92%' } });
+  });
+  gsap.utils.toArray('[data-sparkle]').forEach((el, i) => {
+    gsap.to(el, { scale: 0.55, rotation: 45, opacity: 0.6, duration: 1.2 + i * 0.3, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: i * 0.4 });
+  });
 
   /* ---------- Tarjetas de tortas ---------- */
-  ScrollTrigger.batch('[data-card]', {
-    start: 'top 88%',
-    onEnter: (batch) => gsap.fromTo(batch,
-      lite ? { autoAlpha: 0, y: 50 } : { autoAlpha: 0, y: 70, clipPath: 'inset(12% 0% 0% 0%)' },
-      lite
-        ? { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power3.out', stagger: 0.1, overwrite: true }
-        : { autoAlpha: 1, y: 0, clipPath: 'inset(0% 0% 0% 0%)', duration: 1.2, ease: 'power4.out', stagger: 0.14, overwrite: true })
-  });
   gsap.set('[data-card]', { autoAlpha: 0 });
+  ScrollTrigger.batch('[data-card]', {
+    start: 'top 90%',
+    onEnter: (batch) => gsap.fromTo(batch,
+      { autoAlpha: 0, y: 60, rotation: (i) => (i % 2 ? 3 : -3) },
+      { autoAlpha: 1, y: 0, rotation: 0, duration: 1, ease: 'power4.out', stagger: 0.12, overwrite: true })
+  });
 
-  // Leve inclinación 3D al pasar el mouse (solo con puntero fino)
-  if (window.matchMedia('(pointer: fine)').matches) {
-    document.querySelectorAll('[data-card] .card__media').forEach((media) => {
-      const ph = media.querySelector('.ph');
-      media.addEventListener('mousemove', (e) => {
-        const r = media.getBoundingClientRect();
-        const x = (e.clientX - r.left) / r.width - 0.5;
-        const y = (e.clientY - r.top) / r.height - 0.5;
-        gsap.to(ph, { rotateY: x * 6, rotateX: -y * 6, x: x * 10, y: y * 10, transformPerspective: 900, duration: 0.6, ease: 'power2.out' });
+  /* ---------- Arcos fotográficos ---------- */
+  gsap.from('[data-arch]', { clipPath: 'inset(100% 0% 0% 0%)', duration: 1.3, ease: 'expo.inOut', scrollTrigger: { trigger: '[data-arch]', start: 'top 85%' } });
+
+  /* ---------- Mariposas: vuelo suave + reaccionan al scroll ---------- */
+  setupButterflies();
+
+  function setupButterflies() {
+    // Aleteo lento en reposo: el vuelo lo hace GSAP; el aleteo, el CSS
+    const flies = gsap.utils.toArray('[data-fly]');
+    flies.forEach((fly) => {
+      const base = fly.dataset.fly === 'hero' ? { rotation: -14, scaleX: 1 } : { rotation: 18, scaleX: -1 };
+      if (fly !== heroFly) gsap.set(fly, base);
+      // Flota describiendo un pequeño ocho
+      gsap.to(fly, { y: '+=14', duration: 2.6, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: 1.6 });
+      gsap.to(fly, { x: '+=10', rotation: base.rotation + 5, duration: 3.4, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: 1.6 });
+    });
+
+    // La mariposa del hero vuela hacia arriba y a la derecha mientras bajas
+    if (heroFly && !lite) {
+      gsap.to(heroFly, {
+        xPercent: 60, yPercent: -90, rotation: 6, ease: 'none',
+        scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom top', scrub: 1.2 }
       });
-      media.addEventListener('mouseleave', () => gsap.to(ph, { rotateY: 0, rotateX: 0, x: 0, y: 0, duration: 0.8, ease: 'power3.out' }));
-    });
-  }
-
-  /* ---------- Cinta infinita que reacciona al scroll ---------- */
-  const track = document.querySelector('.marquee__track');
-  if (track) {
-    const loop = gsap.to(track, { xPercent: -50, duration: 28, ease: 'none', repeat: -1 });
-    if (!lite) ScrollTrigger.create({
-      trigger: '.marquee', start: 'top bottom', end: 'bottom top',
-      onUpdate: (self) => {
-        const dir = self.direction;
-        const boost = gsap.utils.clamp(1, 6, 1 + Math.abs(self.getVelocity()) / 400);
-        gsap.to(loop, {
-          timeScale: dir * boost, duration: 0.25, overwrite: true,
-          onComplete: () => gsap.to(loop, { timeScale: dir, duration: 1.2, ease: 'power2.out' })
-        });
+    }
+    // La pequeña cruza la sección Historia
+    const small = document.querySelector('[data-fly="small"]');
+    if (small && !lite) {
+      gsap.to(small, {
+        xPercent: -140, yPercent: 120, rotation: 30, ease: 'none',
+        scrollTrigger: { trigger: '.historia', start: 'top bottom', end: 'bottom top', scrub: 1.5 }
+      });
+    }
+    // Al hacer scroll aletean rápido, como asustadas
+    let flyTimer;
+    ScrollTrigger.create({
+      onUpdate: () => {
+        flies.forEach((f) => f.classList.add('is-flying'));
+        clearTimeout(flyTimer);
+        flyTimer = setTimeout(() => flies.forEach((f) => f.classList.remove('is-flying')), 500);
       }
     });
   }
 
-  /* ---------- Así nace tu torta: escena pineada ---------- */
-  setupBuild();
-
-  function setupBuild() {
-    const section = document.getElementById('build');
-    if (!section) return;
-    const steps = section.querySelectorAll('.build__step');
-    const bar = document.getElementById('buildBar');
-    const q = (s) => section.querySelector(s);
-
-    gsap.set([q('.b-l1'), q('.b-l2'), q('.b-l3'), q('.b-drip'), q('.b-deco'), q('.b-cherry'), q('.b-candle'), q('.b-flame'), q('.b-topper'), q('.b-conf')], { autoAlpha: 0 });
-
-    const tl = gsap.timeline({
-      defaults: { ease: 'power2.out', duration: 1 },
-      scrollTrigger: {
-        trigger: section, start: 'top top', end: '+=320%', pin: true, scrub: 0.8, anticipatePin: 1,
-        onUpdate: (self) => {
-          const i = Math.min(steps.length - 1, Math.floor(self.progress * steps.length));
-          steps.forEach((s, n) => s.classList.toggle('is-active', n === i));
-          bar.style.transform = 'scaleX(' + self.progress + ')';
-        }
+  /* ---------- Jarrones: entran uno a uno y luego se mecen ---------- */
+  const vases = document.querySelector('[data-vases]');
+  if (vases) {
+    const parts = vases.querySelectorAll('.vases__v');
+    gsap.set(parts, { yPercent: 40, autoAlpha: 0 });
+    gsap.set('.vases__shelf', { xPercent: -100 });
+    ScrollTrigger.create({
+      trigger: vases, start: 'top 90%', once: true,
+      onEnter: () => {
+        gsap.timeline({ onComplete: () => { gsap.set(parts, { clearProps: 'transform,opacity,visibility' }); vases.classList.add('is-in'); } })
+          .to('.vases__shelf', { xPercent: 0, duration: 0.9, ease: 'expo.out' })
+          .to(parts, { yPercent: 0, autoAlpha: 1, duration: 0.9, ease: 'back.out(1.6)', stagger: 0.15 }, 0.3);
       }
     });
-
-    tl.to(q('.b-blue'), { autoAlpha: 0, duration: 1.2 }, 0.2)
-      .fromTo(q('.b-l1'), { autoAlpha: 0, y: -240 }, { autoAlpha: 1, y: 0, ease: 'bounce.out', duration: 1.3 }, 0.5)
-      .fromTo(q('.b-l2'), { autoAlpha: 0, y: -260 }, { autoAlpha: 1, y: 0, ease: 'bounce.out', duration: 1.2 }, 1.8)
-      .fromTo(q('.b-l3'), { autoAlpha: 0, y: -280 }, { autoAlpha: 1, y: 0, ease: 'bounce.out', duration: 1.1 }, 3)
-      .fromTo(q('.b-drip'), { autoAlpha: 0, scaleY: 0, transformOrigin: '50% 0%' }, { autoAlpha: 1, scaleY: 1, duration: 1.2 }, 4.2)
-      .fromTo(q('.b-deco'), { autoAlpha: 0, y: 120, scale: 0.6, transformOrigin: '50% 100%' }, { autoAlpha: 1, y: 0, scale: 1, ease: 'back.out(1.4)', duration: 1.2 }, 5.4)
-      .fromTo(q('.b-cherry'), { autoAlpha: 0, y: -320 }, { autoAlpha: 1, y: 0, ease: 'bounce.out', duration: 1 }, 6.8)
-      .fromTo(q('.b-candle'), { autoAlpha: 0, scaleY: 0, transformOrigin: '50% 100%' }, { autoAlpha: 1, scaleY: 1, duration: 0.6 }, 7.8)
-      .fromTo(q('.b-topper'), { autoAlpha: 0, scale: 0.2, rotate: -12, transformOrigin: '0% 100%' }, { autoAlpha: 1, scale: 1, rotate: 0, ease: 'back.out(1.8)', duration: 0.8 }, 8.2)
-      .fromTo(q('.b-flame'), { autoAlpha: 0, scale: 0, transformOrigin: '50% 100%' }, { autoAlpha: 1, scale: 1, duration: 0.5 }, 8.6)
-      .fromTo(q('.b-conf'), { autoAlpha: 0, y: -140, rotate: 0 }, { autoAlpha: 1, y: 0, rotate: 12, duration: 1.2 }, 8.8)
-      .to({}, { duration: 0.6 });
-
-    // Llamas que titilan
-    gsap.to(q('.b-flame'), { scaleY: 1.12, repeat: -1, yoyo: true, duration: 0.35, ease: 'sine.inOut', transformOrigin: '50% 100%' });
+    // Inclinación 3D al pasar el mouse
+    if (finePointer) {
+      vases.closest('.plum').addEventListener('mousemove', (e) => {
+        const r = vases.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - 0.5;
+        gsap.to(vases, { rotationY: x * 8, transformPerspective: 900, duration: 0.6, ease: 'power2.out' });
+      });
+      vases.closest('.plum').addEventListener('mouseleave', () => gsap.to(vases, { rotationY: 0, duration: 0.8 }));
+    }
   }
 
-  /* ---------- Proceso ---------- */
-  gsap.from('.steps__rule', { scaleX: 0, duration: 1.6, ease: 'expo.inOut', scrollTrigger: { trigger: '.steps', start: 'top 85%' } });
-  gsap.from('[data-step]', { autoAlpha: 0, y: 50, duration: 1.1, stagger: 0.18, ease: 'power3.out', scrollTrigger: { trigger: '.steps', start: 'top 80%' } });
-  gsap.utils.toArray('.step__num').forEach((n) => {
-    gsap.from(n, { yPercent: 60, rotate: -8, duration: 1.2, ease: 'power4.out', scrollTrigger: { trigger: n, start: 'top 90%' } });
-  });
+  /* ---------- Flores del hero: se mecen con el viento ---------- */
+  gsap.to('.hero__flowers', { rotation: 2.2, duration: 3.2, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: 2.2 });
 
-  /* ---------- Historia: la foto se descubre ---------- */
-  if (lite) {
-    gsap.from('[data-clip]', { autoAlpha: 0, y: 40, duration: 0.9, ease: 'power3.out', scrollTrigger: { trigger: '[data-clip]', start: 'top 85%' } });
-  } else {
-    gsap.fromTo('[data-clip]', { clipPath: 'inset(15% 15% 15% 15%)' }, {
-      clipPath: 'inset(0% 0% 0% 0%)', ease: 'none',
-      scrollTrigger: { trigger: '.historia', start: 'top 80%', end: 'center center', scrub: true }
+  /* ---------- Parallax suave de las piezas al hacer scroll (escritorio) ---------- */
+  if (!lite) {
+    [['.hero__note', -40], ['.hero__plum', 30], ['.hero__arch', -20], ['.tortas__plum', -30], ['.historia__note', -50], ['.historia__arch', 25]].forEach(([sel, d]) => {
+      gsap.to(sel, { y: d, ease: 'none', scrollTrigger: { trigger: sel, start: 'top bottom', end: 'bottom top', scrub: true } });
     });
   }
-  gsap.from('.historia__list li', { autoAlpha: 0, x: -24, stagger: 0.12, duration: 0.9, ease: 'power3.out', scrollTrigger: { trigger: '.historia__list', start: 'top 90%' } });
-
-  /* ---------- Galería ---------- */
-  gsap.from('[data-tile]', {
-    autoAlpha: 0, y: 80, rotate: (i) => (i % 2 ? 3 : -3), duration: 1.1, stagger: 0.1, ease: 'power4.out',
-    scrollTrigger: { trigger: '.galeria__grid', start: 'top 88%' }
-  });
-
-  /* ---------- Parallax ---------- */
-  gsap.utils.toArray('[data-parallax]').forEach((el) => {
-    const speed = parseFloat(el.dataset.parallax) || 0.1;
-    gsap.to(el, { y: () => speed * window.innerHeight * 2, ease: 'none', scrollTrigger: { trigger: el.parentElement, start: 'top bottom', end: 'bottom top', scrub: true, invalidateOnRefresh: true } });
-  });
-  if (!lite) gsap.utils.toArray('[data-parallax-inner]').forEach((el) => {
-    gsap.fromTo(el, { yPercent: -18 }, { yPercent: 18, ease: 'none', scrollTrigger: { trigger: el.closest('figure'), start: 'top bottom', end: 'bottom top', scrub: true } });
-  });
 
   /* ---------- Botones magnéticos ---------- */
-  if (window.matchMedia('(pointer: fine)').matches) {
+  if (finePointer) {
     document.querySelectorAll('.magnetic').forEach((btn) => {
       btn.addEventListener('mousemove', (e) => {
         const r = btn.getBoundingClientRect();
@@ -309,14 +305,12 @@
     });
   }
 
-  // Recalcular posiciones cuando carguen fuentes
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => ScrollTrigger.refresh());
+  fontsReady.then(() => ScrollTrigger.refresh());
 
   /* =========================================================
      Funciones base (funcionan con o sin GSAP)
      ========================================================= */
   function setupBasics() {
-    // Links internos con scroll suave
     document.querySelectorAll('[data-scroll-to]').forEach((a) => {
       a.addEventListener('click', (e) => {
         const href = a.getAttribute('href');
@@ -330,10 +324,11 @@
     // Menú móvil
     const burger = document.getElementById('burger');
     const links = document.getElementById('navLinks');
+    const nav = document.getElementById('nav');
     function closeMenu() {
       if (!links.classList.contains('is-open')) return;
       links.classList.remove('is-open');
-      document.getElementById('nav').classList.remove('is-menu-open');
+      nav.classList.remove('is-menu-open');
       burger.setAttribute('aria-expanded', 'false');
       burger.setAttribute('aria-label', 'Abrir menú');
       if (lenis) lenis.start();
@@ -341,17 +336,16 @@
     burger.addEventListener('click', () => {
       const open = !links.classList.contains('is-open');
       links.classList.toggle('is-open', open);
-      document.getElementById('nav').classList.toggle('is-menu-open', open);
+      nav.classList.toggle('is-menu-open', open);
       burger.setAttribute('aria-expanded', String(open));
       burger.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
       if (lenis) open ? lenis.stop() : lenis.start();
     });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenu(); });
 
-    // Nav: al bajar desaparece. Con mouse, vuelve solo al acercar el puntero al borde superior;
+    // Nav: al bajar desaparece. Con mouse, vuelve al acercar el puntero al borde superior;
     // en pantallas táctiles (sin mouse) vuelve al hacer scroll hacia arriba.
-    const nav = document.getElementById('nav');
-    const sections = ['tortas', 'proceso', 'historia', 'galeria', 'contacto'].map((id) => document.getElementById(id));
+    const sections = ['inicio', 'tortas', 'pedir', 'historia', 'contacto'].map((id) => document.getElementById(id));
     const navLinks = links.querySelectorAll('a');
     const HIDE_AFTER = 160;
     let lastY = 0;
@@ -365,7 +359,7 @@
     };
     if (finePointer) {
       document.addEventListener('mousemove', (e) => {
-        const near = e.clientY < 96 || nav.matches(':hover');
+        const near = e.clientY < 110 || nav.matches(':hover');
         if (near !== pointerNearTop) { pointerNearTop = near; updateNav(); }
       }, { passive: true });
       document.documentElement.addEventListener('mouseleave', () => { pointerNearTop = false; updateNav(); });
@@ -376,11 +370,12 @@
       lastY = y;
       updateNav();
 
-      let current = null;
-      sections.forEach((s) => { if (s && s.getBoundingClientRect().top < window.innerHeight * 0.4) current = s.id; });
+      let current = 'inicio';
+      sections.forEach((s) => { if (s && s.getBoundingClientRect().top < window.innerHeight * 0.45) current = s.id; });
       navLinks.forEach((a) => a.classList.toggle('is-active', a.getAttribute('href') === '#' + current));
     };
     window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
 
     bindQuoteForm(document.getElementById('quoteForm'), document.getElementById('formHint'), '.field');
     bindQuoteForm(document.getElementById('miliForm'), document.querySelector('.mili-form__hint'), '.mili-field');
@@ -434,10 +429,11 @@
     const bot = document.getElementById('miliBot');
     const bubble = document.getElementById('miliBubble');
     const panel = document.getElementById('miliPanel');
+    const lean = document.getElementById('miliLean');
+    const eyes = document.getElementById('miliEyes');
     const views = panel.querySelectorAll('.mili-view');
     const messages = ['¡Hola! ¿Pedimos tu torta? 🎂', 'Escríbeme, te ayudo 💬', '¿Qué vamos a celebrar? 🎉', 'Pide tu torta conmigo 🍒'];
     let msgIndex = 0;
-    let bubbleTimer = null;
 
     const isOpen = () => mili.classList.contains('is-open');
     const showView = (name) => views.forEach((v) => v.classList.toggle('is-active', v.dataset.view === name));
@@ -447,6 +443,7 @@
       bot.setAttribute('aria-expanded', 'true');
       bubble.classList.remove('is-visible');
       showView(view || 'home');
+      mood('love');
     }
     function close() {
       if (!isOpen()) return;
@@ -465,16 +462,89 @@
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
     document.addEventListener('pointerdown', (e) => { if (isOpen() && !mili.contains(e.target)) close(); });
 
-    // Globo que recuerda que puedes hablarle (el salto cada 2 s lo hace el CSS)
+    // Globo que recuerda que puedes hablarle
     function cycleBubble() {
       if (!isOpen() && !root.classList.contains('is-intro')) {
         bubble.textContent = messages[msgIndex++ % messages.length];
         bubble.classList.add('is-visible');
         setTimeout(() => bubble.classList.remove('is-visible'), 4000);
       }
-      bubbleTimer = setTimeout(cycleBubble, 12000);
+      setTimeout(cycleBubble, 12000);
     }
-    bubbleTimer = setTimeout(cycleBubble, 5000);
+    setTimeout(cycleBubble, 5000);
+
+    if (reduceMotion) return;
+
+    /* Estados de ánimo: cada 2 s hace algo distinto para verse viva */
+    const MOODS = { hop: 1000, wiggle: 900, spin: 1100, jelly: 900, peek: 1400, dance: 1400, wave: 1200, wink: 600, look: 1500 };
+    const WEIGHTS = { hop: 4, wiggle: 3, jelly: 2, wave: 3, look: 3, wink: 2, peek: 2, dance: 2, spin: 1 };
+    let lastMood = '';
+    let moodTimer = null;
+    let watching = false;
+
+    function pickMood() {
+      const pool = [];
+      Object.keys(WEIGHTS).forEach((m) => { if (m !== lastMood) for (let i = 0; i < WEIGHTS[m]; i++) pool.push(m); });
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+    function mood(name) {
+      const cls = 'mili--' + name;
+      clearTimeout(moodTimer);
+      Object.keys(MOODS).concat('love').forEach((m) => mili.classList.remove('mili--' + m));
+      // Reinicia la animación aunque se repita el estado
+      void mili.offsetWidth;
+      mili.classList.add(cls);
+      moodTimer = setTimeout(() => mili.classList.remove(cls), MOODS[name] || 1300);
+      lastMood = name;
+    }
+    setInterval(() => {
+      if (isOpen() || watching || root.classList.contains('is-intro') || document.hidden) return;
+      mood(pickMood());
+    }, 2000);
+    bot.addEventListener('mouseenter', () => { if (!isOpen()) mood('wave'); });
+
+    /* Al hacer scroll, Mili se inclina hacia la web y la sigue con los ojos */
+    if (!hasGsap) return;
+    const leanRot = gsap.quickTo(lean, 'rotation', { duration: 0.45, ease: 'power3.out' });
+    const leanX = gsap.quickTo(lean, 'x', { duration: 0.45, ease: 'power3.out' });
+    const leanSkew = gsap.quickTo(lean, 'skewX', { duration: 0.45, ease: 'power3.out' });
+    const eyeX = gsap.quickTo(eyes, 'x', { duration: 0.35, ease: 'power2.out' });
+    const eyeY = gsap.quickTo(eyes, 'y', { duration: 0.35, ease: 'power2.out' });
+    let idleTimer = null;
+    let lastScrollY = window.scrollY;
+    let lastT = performance.now();
+
+    function watch(velocity) {
+      if (isOpen()) return;
+      const speed = Math.min(1, Math.abs(velocity) / 2200);
+      const down = velocity > 0;
+      if (!watching) { watching = true; mili.classList.add('is-watching'); }
+      // Se inclina hacia la página (izquierda) según la velocidad y mira hacia donde va el contenido
+      leanRot(-(6 + speed * 12));
+      leanX(-(4 + speed * 8));
+      leanSkew(down ? speed * 5 : -speed * 5);
+      eyeX(-3.5);
+      eyeY(down ? -2.6 : 2.6);
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => {
+        watching = false;
+        mili.classList.remove('is-watching');
+        leanRot(0); leanX(0); leanSkew(0); eyeX(0); eyeY(0);
+        if (Math.random() < 0.35) mood('look');
+      }, 420);
+    }
+
+    if (lenis) {
+      lenis.on('scroll', (e) => { if (Math.abs(e.velocity) > 6) watch(e.velocity * 60); });
+    } else {
+      window.addEventListener('scroll', () => {
+        const now = performance.now();
+        const dt = Math.max(16, now - lastT);
+        const v = (window.scrollY - lastScrollY) / dt * 1000;
+        lastScrollY = window.scrollY; lastT = now;
+        if (Math.abs(v) > 40) watch(v);
+      }, { passive: true });
+    }
   }
 
 })();

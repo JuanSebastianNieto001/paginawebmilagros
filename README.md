@@ -5,12 +5,12 @@ Landing page de **Milagros Tortas Temáticas**: tortas temáticas artesanales co
 ## Estructura
 
 ```
-index.html              Página principal
-css/styles.css          Estilos (responsive, desktop y móvil)
-js/main.js              Intro, transiciones y animaciones
-assets/img/             Logo
+index.html              Página principal (diseño collage)
+css/styles.css          Estilos: lienzo de 1440px escalado en escritorio, flujo apilado en celular
+js/main.js              Intro, transiciones, animaciones y Mili
+assets/img/             Logo, mariposa, flores y jarrones (WebP)
 assets/video/           Video de intro (intro-milagros-v4.mp4)
-design/                 Export original del diseño (referencia)
+design/                 Exports originales de los diseños (referencia)
 ```
 
 ## Qué incluye
@@ -18,10 +18,12 @@ design/                 Export original del diseño (referencia)
 - **Intro en video** a pantalla completa cada vez que se carga o recarga la página.
   Al terminar, en poco más de un segundo el último cuadro se desenfoca, sube una cortina ciruela por columnas y se abre mostrando la web.
 - **Siempre arranca arriba**: al recargar, la página vuelve al hero aunque antes estuvieras más abajo o hubiera un `#ancla` en la URL.
-- **Animaciones**: títulos que suben línea por línea, manifiesto que se ilumina al leer, tarjetas con entrada escalonada e inclinación 3D al pasar el mouse, cinta infinita que reacciona al scroll, parallax de ornamentos florales, botones magnéticos.
-- **"Así nace tu torta"**: escena fija en la que la torta se arma capa por capa mientras haces scroll.
+- **Diseño collage**: notas de papel con chinches, cinta washi, arcos fotográficos, bloques ciruela y haces de luz. En escritorio el lienzo de 1440px se escala al ancho de la pantalla; en celular (≤1000px) pasa a un flujo apilado.
+- **Animaciones**: los papeles caen sobre el tablero al hacer scroll, las líneas se dibujan, los títulos suben palabra por palabra, destellos que titilan, parallax de las piezas.
+- **Mariposas**: aletean (el PNG se divide en dos alas con perspectiva 3D), flotan y vuelan por la pantalla mientras haces scroll.
+- **Jarrones**: cada jarrón se recorta del mismo PNG y se mece a su ritmo; hay pétalos que flotan desde la flor y un reflejo de luz que barre el vidrio.
 - **Formulario → WhatsApp**: arma el mensaje de cotización y abre WhatsApp. Valida que la fecha tenga mínimo 3 días de anticipación.
-- **Mili, la tortica asistente**: siempre abajo a la derecha, salta y saluda cada 2 segundos y muestra globos de diálogo. Al tocarla abre un panel con WhatsApp, Instagram y un formulario para pedir la torta (se envía por WhatsApp).
+- **Mili, la tortica asistente**: siempre abajo a la derecha. Cada 2 segundos hace algo distinto (salta, baila, gira, saluda, guiña, mira alrededor…) y, mientras haces scroll, se inclina hacia la web y la sigue con los ojos. Muestra globos de diálogo y al tocarla abre un panel con WhatsApp, Instagram y un formulario para pedir la torta.
 - Header que desaparece al bajar: con mouse reaparece al acercar el puntero al borde superior; en celular, al hacer scroll hacia arriba.
 - Menú móvil a pantalla completa.
 - En celular se desactivan efectos costosos (desenfoques, recortes animados) para que las animaciones vayan fluidas.
