@@ -22,9 +22,10 @@
   --photo-grad: linear-gradient(160deg, #7e5774 0%, #48133d 100%);
   --pin-grad: radial-gradient(circle at 35% 30%, #ffffff 0%, #f7c2f0 40%, #c774b3 100%);
 
-  --serif: 'Cormorant Garamond', Georgia, serif;
-  --sans: 'Jost', system-ui, sans-serif;
-  --script: 'Sacramento', cursive;
+  /* Una sola cursiva ligada y legible para toda la web */
+  --serif: 'Dancing Script', 'Segoe Script', cursive;
+  --sans: 'Dancing Script', 'Segoe Script', cursive;
+  --script: 'Dancing Script', 'Segoe Script', cursive;
   --ease: cubic-bezier(.22, 1, .36, 1);
   --nav-h: 84px;
   --s: 1;
@@ -39,7 +40,7 @@ html.lenis, html.lenis body { height: auto; }
 body {
   margin: 0;
   font-family: var(--sans);
-  font-weight: 400;
+  font-weight: 500;
   background: var(--plum-3);
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
@@ -189,7 +190,7 @@ em { font-style: italic; }
 .h2 em { color: var(--mauve); }
 .h2--light { color: #fff; }
 .h2--light em { color: var(--pink); }
-.split-line { overflow: hidden; padding-bottom: .1em; margin-bottom: -.1em; }
+.split-line { overflow: hidden; padding: .14em .06em .22em; margin: -.14em -.06em -.22em; }
 
 /* Arcos fotográficos */
 .arch { position: absolute; margin: 0; border: 1px solid var(--plum); padding: 22px; background: rgba(255,255,255,.35); box-shadow: 0 40px 80px rgba(72,19,61,.28); }
@@ -263,7 +264,7 @@ em { font-style: italic; }
 .hero__l4 { top: 108px; left: 40px; width: 380px; }
 .hero__l5 { top: 108px; left: 40px; height: 610px; }
 .hero__tag { top: 36px; left: 260px; padding: 12px 36px; }
-.hero__arch { top: 150px; left: 96px; width: 470px; height: 700px; border-radius: 235px 235px 0 0; }
+.hero__arch { top: 150px; left: 96px; width: 470px; height: 590px; border-radius: 235px 235px 0 0; }
 .hero__arch .arch__inner { border-radius: 213px 213px 0 0; }
 .hero__by { top: 150px; left: 760px; }
 .hero__note { top: 300px; left: 760px; width: 470px; height: 360px; padding: 56px 48px; display: flex; flex-direction: column; gap: 18px; --rot: -1.5deg; }
@@ -272,13 +273,13 @@ em { font-style: italic; }
 .hero__hash { font-size: 30px; }
 .hero__sp1 { top: 180px; left: 700px; width: 30px; height: 30px; }
 .hero__sp2 { top: 520px; left: 620px; width: 40px; height: 40px; }
-.hero__title { position: absolute; top: 770px; left: 96px; margin: 0; width: 620px; font-family: var(--serif); font-weight: 400; font-size: 96px; line-height: .96; letter-spacing: -.02em; color: var(--plum); }
+.hero__title { position: absolute; top: 780px; left: 96px; z-index: 2; margin: 0; width: 640px; font-family: var(--serif); font-weight: 600; font-size: 88px; line-height: 1; color: var(--plum); }
 .hero__title em { color: var(--mauve); }
 .hero__script { position: absolute; top: 1060px; left: 100px; margin: 0; font-size: 40px; }
 .hero__plum { top: 730px; left: 760px; width: 560px; height: 390px; padding: 48px 44px; }
 .hero__plum .btn { margin-top: auto; align-self: flex-start; }
 .flowers { position: absolute; object-fit: contain; pointer-events: none; }
-.hero__flowers { top: 540px; left: 540px; width: 320px; height: 597px; transform-origin: 50% 100%; }
+.hero__flowers { top: 540px; left: 560px; width: 320px; height: 597px; transform-origin: 50% 100%; }
 .hero__pin { top: 640px; left: 1330px; }
 .hero__thread { top: 668px; left: 1344px; height: 300px; }
 .hero__washi { top: 1030px; left: 640px; width: 220px; height: 38px; transform: rotate(-8deg); }
@@ -605,4 +606,65 @@ html.is-intro .mili { opacity: 0; transform: translateY(30px); pointer-events: n
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+/* =========================================================
+   TIPOGRAFÍA: cursiva ligada y legible en toda la web
+   (sin mayúsculas ni espaciado entre letras, para que la letra se enlace)
+   ========================================================= */
+em, .tag--serif, .step__num, .note__quote { font-style: normal; }
+.tag, .nav__links, .kicker, .chips span, .card__media, .arch__inner, .field label, .footer, .btn, .contacto__ig,
+.mili-field span, .mili-panel__status, .mili-back, .mili-submit, .mili__badge, .hero__tag {
+  text-transform: none; letter-spacing: 0;
+}
+.tag { font-size: 20px; font-weight: 500; padding: 10px 26px; word-spacing: .12em; }
+.tag--serif { font-size: 24px; }
+.hero__tag { padding: 10px 34px; }
+.nav__links { font-size: 20px; font-weight: 500; gap: 14px; }
+.nav__links a { padding: 7px 16px; }
+.brand__script { font-size: 32px; font-weight: 600; }
+.h2 { font-weight: 600; }
+.note__text { font-weight: 600; font-size: 50px; }
+.hero__script, .plum__hash, .hero__hash, .card__hash, .note__hash, .historia__sign, .footer__script { font-weight: 500; }
+.plum p { font-size: 22px; line-height: 1.5; }
+.tortas__plum p { font-size: 21px; }
+.hero__plum .btn { margin-top: auto; }
+.btn { font-size: 19px; font-weight: 600; }
+.btn--pink { padding: 14px 30px; }
+.card__media { font-size: 16px; }
+.arch__inner { font-size: 16px; }
+.card h3 { font-weight: 600; }
+.step__num { font-size: 24px; }
+.step h3 { font-weight: 600; }
+.step p { font-size: 19px; }
+.historia__text { font-size: 21px; line-height: 1.6; }
+.chips span { font-size: 17px; padding: 6px 16px; }
+.note__quote { font-size: 26px; font-weight: 600; }
+.kicker { font-size: 20px; }
+.contacto__text { font-size: 20px; }
+.contacto__phone { font-weight: 600; }
+.contacto__ig { font-size: 19px; }
+.field label { font-size: 17px; }
+.field input, .field textarea { font: 500 19px var(--sans); }
+.footer { font-size: 17px; }
+.mili__bubble { font: 500 17px/1.35 var(--sans); }
+.mili__badge { font: 600 12px/20px var(--sans); }
+.mili-panel__name { font-size: 34px; font-weight: 600; }
+.mili-panel__status { font-size: 15px; }
+.mili-msg { font-size: 17px; }
+.mili-action { font: 500 17px/1.3 var(--sans); }
+.mili-action small { font-size: 15px; }
+.mili-back { font: 500 16px var(--sans); }
+.mili-field span { font-size: 15px; }
+.mili-field input, .mili-field textarea { font: 500 18px var(--sans); }
+.mili-submit { font: 600 18px var(--sans); }
+.form__hint, .mili-form__hint { font-size: 16px; }
+
+@media (max-width: 1000px) {
+  .nav__links a { font-family: var(--sans); font-size: 40px; }
+  .tag { font-size: 18px; padding: 8px 18px; }
+  .hero__title { font-size: clamp(46px, 12vw, 66px); font-weight: 600; }
+  .note__text { font-size: clamp(30px, 8.5vw, 40px); }
+  .plum p { font-size: 19px; }
+  .hero__flowers { margin: -70px -6px -30px auto; }
 }

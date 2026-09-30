@@ -34,7 +34,7 @@ design/                 Exports originales de los diseños (referencia)
 - [GSAP 3 + ScrollTrigger](https://gsap.com/) — animaciones y scroll
 - [Lenis](https://lenis.darkroom.engineering/) — smooth scroll
 - [SplitType](https://github.com/lukePeavey/SplitType) — división de texto en líneas y palabras
-- Google Fonts: Cormorant Garamond, Jost, Sacramento
+- Google Fonts: Dancing Script (una sola cursiva ligada y legible para toda la web)
 
 ## Ver en local
 
