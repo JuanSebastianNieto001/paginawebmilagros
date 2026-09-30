@@ -516,6 +516,8 @@
     const leanSkew = gsap.quickTo(lean, 'skewX', { duration: 0.45, ease: 'power3.out' });
     const eyeX = gsap.quickTo(eyes, 'x', { duration: 0.35, ease: 'power2.out' });
     const eyeY = gsap.quickTo(eyes, 'y', { duration: 0.35, ease: 'power2.out' });
+    const leanY = gsap.quickTo(lean, 'y', { duration: 0.45, ease: 'power3.out' });
+    const leanScaleY = gsap.quickTo(lean, 'scaleY', { duration: 0.45, ease: 'power3.out' });
     let idleTimer = null;
     let lastScrollY = window.scrollY;
     let lastT = performance.now();
@@ -525,17 +527,20 @@
       const speed = Math.min(1, Math.abs(velocity) / 2200);
       const down = velocity > 0;
       if (!watching) { watching = true; mili.classList.add('is-watching'); }
-      // Se inclina hacia la página (izquierda) según la velocidad y mira hacia donde va el contenido
-      leanRot(-(6 + speed * 12));
-      leanX(-(4 + speed * 8));
+      // Se inclina hacia la página (izquierda) y mira en la dirección del scroll:
+      // hacia abajo si bajas (se agacha un poco), hacia arriba si subes (se estira).
+      leanRot(-(6 + speed * 10));
+      leanX(-(4 + speed * 6));
       leanSkew(down ? speed * 5 : -speed * 5);
-      eyeX(-3.5);
-      eyeY(down ? -2.6 : 2.6);
+      leanY(down ? 3 : -5);
+      leanScaleY(down ? 0.95 : 1.05);
+      eyeX(-2);
+      eyeY(down ? 4 : -4);
       clearTimeout(idleTimer);
       idleTimer = setTimeout(() => {
         watching = false;
         mili.classList.remove('is-watching');
-        leanRot(0); leanX(0); leanSkew(0); eyeX(0); eyeY(0);
+        leanRot(0); leanX(0); leanSkew(0); leanY(0); leanScaleY(1); eyeX(0); eyeY(0);
         if (Math.random() < 0.35) mood('look');
       }, 420);
     }
