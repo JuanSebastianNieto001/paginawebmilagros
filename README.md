@@ -6,6 +6,7 @@ Landing page de **Milagros Tortas Temáticas**: tortas temáticas artesanales co
 
 ```
 index.html              Página principal (diseño collage)
+te-escuchamos.html      Página "Te escuchamos": sugerencias y comentarios
 css/styles.css          Estilos: lienzo de 1440px escalado en escritorio, flujo apilado en celular
 js/main.js              Intro, transiciones, animaciones y Mili
 assets/img/             Logo, mariposa, flores y jarrones (WebP)
@@ -22,6 +23,7 @@ design/                 Exports originales de los diseños (referencia)
 - **Animaciones**: los papeles caen sobre el tablero al hacer scroll, las líneas se dibujan, los títulos suben palabra por palabra, destellos que titilan, parallax de las piezas.
 - **Mariposas**: aletean (el PNG se divide en dos alas con perspectiva 3D), flotan y vuelan por la pantalla mientras haces scroll.
 - **Jarrones**: cada jarrón se recorta del mismo PNG y se mece a su ritmo; hay pétalos que flotan desde la flor y un reflejo de luz que barre el vidrio.
+- **Te escuchamos**: página aparte (enlace en el menú) donde la gente elige el tipo de mensaje, califica con corazones y escribe su sugerencia; se envía por WhatsApp. Entre páginas hay una transición de cortina, y al volver a la portada desde ahí se salta el video y baja a la sección elegida.
 - **Formulario → WhatsApp**: arma el mensaje de cotización y abre WhatsApp. Valida que la fecha tenga mínimo 3 días de anticipación.
 - **Mili, la tortica asistente**: siempre abajo a la derecha. Cada 2 segundos hace algo distinto (salta, baila, gira, saluda, guiña, mira alrededor…) y, mientras haces scroll, se inclina hacia la web y la sigue con los ojos. Muestra globos de diálogo y al tocarla abre un panel con WhatsApp, Instagram y un formulario para pedir la torta.
 - Header que desaparece al bajar: con mouse reaparece al acercar el puntero al borde superior; en celular, al hacer scroll hacia arriba.

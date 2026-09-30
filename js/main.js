@@ -14,8 +14,19 @@
   const lite = window.matchMedia('(hover: none), (pointer: coarse)').matches || window.innerWidth <= 1000;
   const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
   const isMobileLayout = () => window.innerWidth <= 1000;
+  const isHome = !!document.getElementById('intro');
+  const has = (sel) => !!document.querySelector(sel);
 
-  /* ---------- Siempre arrancar arriba en cada recarga ---------- */
+  /* ---------- Navegación entre páginas ----------
+     Al recargar siempre se arranca arriba con la intro. Si se llega desde otra página
+     de la web (p. ej. "Te escuchamos"), se salta el video y se va a la sección pedida. */
+  const NAV_KEY = 'milagros:internal-nav';
+  let fromInner = false;
+  try { fromInner = sessionStorage.getItem(NAV_KEY) === '1'; sessionStorage.removeItem(NAV_KEY); } catch (err) { /* sin storage */ }
+  const navEntry = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+  if (navEntry && navEntry.type === 'reload') fromInner = false;
+  const pendingHash = fromInner && location.hash ? location.hash : null;
+
   if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
   if (location.hash) history.replaceState(null, '', location.pathname + location.search);
   window.scrollTo(0, 0);
@@ -25,6 +36,7 @@
   /* ---------- Escala del tablero (lienzo de 1440px) ---------- */
   const boardWrap = document.getElementById('boardWrap');
   function fitBoard() {
+    if (!boardWrap) return;
     const s = isMobileLayout() ? 1 : Math.min(1.2, window.innerWidth / BOARD_W);
     boardWrap.style.setProperty('--s', s.toFixed(4));
   }
@@ -54,6 +66,34 @@
     else window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY + offset, behavior: reduceMotion ? 'auto' : 'smooth' });
   };
 
+  /* ---------- Cortina entre páginas ---------- */
+  function leaveTo(href) {
+    try { sessionStorage.setItem(NAV_KEY, '1'); } catch (err) { /* sin storage */ }
+    if (!hasGsap || reduceMotion) { location.href = href; return; }
+    const cur = document.createElement('div');
+    cur.className = 'page-curtain';
+    cur.innerHTML = '<span></span><span></span><span></span><span></span><span></span>';
+    document.body.appendChild(cur);
+    if (lenis) lenis.stop();
+    gsap.fromTo(cur.children, { scaleY: 0 }, {
+      scaleY: 1, duration: 0.5, ease: 'power3.inOut', stagger: { each: 0.05, from: 'center' },
+      onComplete: () => { location.href = href; }
+    });
+  }
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('a[data-page-link]');
+    if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+    e.preventDefault();
+    leaveTo(a.getAttribute('href'));
+  });
+
+  function afterUnlock() {
+    // Lenis mide la página al desbloquearla; recién entonces se puede bajar a la sección pedida
+    if (pendingHash) setTimeout(() => { if (lenis) lenis.resize(); scrollToTarget(pendingHash); }, 200);
+  }
+
+  if (!isHome) { setupInnerPage(); return; }
+
   /* ---------- Intro ---------- */
   const intro = document.getElementById('intro');
   const video = document.getElementById('introVideo');
@@ -68,8 +108,9 @@
   function unlockPage() {
     root.classList.remove('is-intro');
     window.scrollTo(0, 0);
-    if (lenis) { lenis.scrollTo(0, { immediate: true }); lenis.start(); }
+    if (lenis) { lenis.resize(); lenis.scrollTo(0, { immediate: true }); lenis.start(); }
     if (hasGsap) ScrollTrigger.refresh();
+    afterUnlock();
   }
 
   function finishIntro() {
@@ -113,9 +154,15 @@
   video.addEventListener('error', () => setTimeout(finishIntro, 600));
   document.addEventListener('keydown', (e) => { if (!introFinished && (e.key === 'Escape' || e.key === 'Enter')) finishIntro(); });
 
-  video.currentTime = 0;
-  const playAttempt = video.play();
-  if (playAttempt && playAttempt.catch) playAttempt.catch(() => setTimeout(finishIntro, 900));
+  if (fromInner) {
+    // Volviendo desde otra página: sin video, solo la cortina
+    if (hasGsap) gsap.set(intro.querySelectorAll('.intro__curtain span'), { scaleY: 1 });
+    requestAnimationFrame(() => finishIntro());
+  } else {
+    video.currentTime = 0;
+    const playAttempt = video.play();
+    if (playAttempt && playAttempt.catch) playAttempt.catch(() => setTimeout(finishIntro, 900));
+  }
 
   /* ---------- Sin GSAP: solo lo esencial ---------- */
   if (!hasGsap) { setupBasics(); return; }
@@ -201,7 +248,7 @@
   gsap.utils.toArray('.board > section:not(.hero) .line--h').forEach((el) => {
     gsap.from(el, { scaleX: 0, duration: 1.4, ease: 'expo.inOut', scrollTrigger: { trigger: el, start: 'top 92%' } });
   });
-  gsap.from('.pedir__band', { scaleX: 0, transformOrigin: 'left center', duration: 1.2, ease: 'expo.inOut', scrollTrigger: { trigger: '.pedir', start: 'top 75%' } });
+  if (has('.pedir__band')) gsap.from('.pedir__band', { scaleX: 0, transformOrigin: 'left center', duration: 1.2, ease: 'expo.inOut', scrollTrigger: { trigger: '.pedir', start: 'top 75%' } });
 
   /* ---------- Chinches y destellos ---------- */
   gsap.utils.toArray('[data-pin]').forEach((el) => {
@@ -221,7 +268,7 @@
   });
 
   /* ---------- Arcos fotográficos ---------- */
-  gsap.from('[data-arch]', { clipPath: 'inset(100% 0% 0% 0%)', duration: 1.3, ease: 'expo.inOut', scrollTrigger: { trigger: '[data-arch]', start: 'top 85%' } });
+  if (has('[data-arch]')) gsap.from('[data-arch]', { clipPath: 'inset(100% 0% 0% 0%)', duration: 1.3, ease: 'expo.inOut', scrollTrigger: { trigger: '[data-arch]', start: 'top 85%' } });
 
   /* ---------- Mariposas: vuelo suave + reaccionan al scroll ---------- */
   setupButterflies();
@@ -248,7 +295,7 @@
     }
     // La pequeña cruza la sección Historia
     const small = document.querySelector('[data-fly="small"]');
-    if (small && !lite) {
+    if (small && !lite && has('.historia')) {
       gsap.to(small, {
         xPercent: -140, yPercent: 120, rotation: 30, ease: 'none',
         scrollTrigger: { trigger: '.historia', start: 'top bottom', end: 'bottom top', scrub: 1.5 }
@@ -291,11 +338,12 @@
   }
 
   /* ---------- Flores del hero: se mecen con el viento ---------- */
-  gsap.to('.hero__flowers', { rotation: 2.2, duration: 3.2, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: 2.2 });
+  if (has('.hero__flowers')) gsap.to('.hero__flowers', { rotation: 2.2, duration: 3.2, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: 2.2 });
 
   /* ---------- Parallax suave de las piezas al hacer scroll (escritorio) ---------- */
   if (!lite) {
     [['.hero__note', -40], ['.hero__plum', 30], ['.hero__arch', -20], ['.tortas__plum', -30], ['.historia__note', -50], ['.historia__arch', 25]].forEach(([sel, d]) => {
+      if (!has(sel)) return;
       gsap.to(sel, { y: d, ease: 'none', scrollTrigger: { trigger: sel, start: 'top bottom', end: 'bottom top', scrub: true } });
     });
   }
@@ -376,6 +424,7 @@
       lastY = y;
       updateNav();
 
+      if (!isHome) return;
       let current = 'inicio';
       sections.forEach((s) => { if (s && s.getBoundingClientRect().top < window.innerHeight * 0.45) current = s.id; });
       navLinks.forEach((a) => a.classList.toggle('is-active', a.getAttribute('href') === '#' + current));
@@ -385,7 +434,86 @@
 
     bindQuoteForm(document.getElementById('quoteForm'), document.getElementById('formHint'), '.field');
     bindQuoteForm(document.getElementById('miliForm'), document.querySelector('.mili-form__hint'), '.mili-field');
+    bindFeedbackForm(document.getElementById('feedbackForm'));
     setupMili();
+  }
+
+  /* ---------- Te escuchamos: sugerencias y comentarios → WhatsApp ---------- */
+  function bindFeedbackForm(form) {
+    if (!form) return;
+    const hint = form.querySelector('.form__hint');
+    const thanks = document.getElementById('feedbackThanks');
+    const ratingText = form.querySelector('.hearts__text');
+    const labels = ['', 'Puede mejorar', 'Regular', 'Bien', 'Muy bien', '¡Me encantó!'];
+    form.querySelectorAll('.hearts input').forEach((r) => r.addEventListener('change', () => {
+      ratingText.textContent = labels[+r.value] || '';
+    }));
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(form));
+      form.querySelectorAll('.field').forEach((f) => f.classList.remove('is-invalid'));
+      if (!data.mensaje || data.mensaje.trim().length < 5) {
+        form.elements.mensaje.closest('.field').classList.add('is-invalid');
+        hint.textContent = 'Cuéntanos un poquito más en tu mensaje.';
+        form.elements.mensaje.focus();
+        return;
+      }
+      hint.textContent = '';
+      const hearts = data.calificacion ? '❤️'.repeat(+data.calificacion) + ' (' + data.calificacion + '/5)' : null;
+      const lines = [
+        '💌 Te escuchamos · Milagros Tortas Temáticas',
+        '',
+        '• Tipo: ' + (data.tipo || 'Comentario'),
+        hearts ? '• Calificación: ' + hearts : null,
+        data.nombre && data.nombre.trim() ? '• Nombre: ' + data.nombre.trim() : null,
+        data.contacto && data.contacto.trim() ? '• Contacto: ' + data.contacto.trim() : null,
+        '',
+        data.mensaje.trim()
+      ].filter((l) => l !== null);
+      window.open('https://wa.me/' + WHATSAPP + '?text=' + encodeURIComponent(lines.join('\n')), '_blank', 'noopener');
+      form.classList.add('is-sent');
+      if (thanks) thanks.classList.add('is-visible');
+    });
+    const again = document.getElementById('feedbackAgain');
+    if (again) again.addEventListener('click', () => {
+      form.reset();
+      ratingText.textContent = '';
+      form.classList.remove('is-sent');
+      thanks.classList.remove('is-visible');
+    });
+  }
+
+  /* ---------- Páginas internas (Te escuchamos) ---------- */
+  function setupInnerPage() {
+    const cur = document.querySelector('.page-curtain');
+    const reveal = () => {
+      root.classList.remove('is-intro');
+      if (lenis) { lenis.resize(); lenis.start(); }
+      if (!hasGsap || reduceMotion) { if (cur) cur.remove(); return; }
+      gsap.registerPlugin(ScrollTrigger);
+      const tl = gsap.timeline();
+      if (cur) tl.to(cur.children, { scaleY: 0, transformOrigin: 'top', duration: 0.8, ease: 'power3.inOut', stagger: { each: 0.06, from: 'edges' }, onComplete: () => cur.remove() });
+      tl.from('[data-in]', { autoAlpha: 0, y: 40, duration: 0.9, ease: 'power3.out', stagger: 0.08 }, 0.35)
+        .from('[data-in-drop]', { autoAlpha: 0, y: -60, rotation: (i) => (i % 2 ? 8 : -8), duration: 1.1, ease: 'back.out(1.4)', stagger: 0.12 }, 0.5)
+        .from('.listen .line--h', { scaleX: 0, duration: 1.2, ease: 'expo.inOut' }, 0.3);
+      gsap.utils.toArray('[data-sparkle]').forEach((el, i) => {
+        gsap.to(el, { scale: 0.55, rotation: 45, opacity: 0.6, duration: 1.2 + i * 0.3, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: i * 0.4 });
+      });
+      gsap.utils.toArray('[data-fly]').forEach((fly) => {
+        const body = fly.querySelector('.fly__body');
+        gsap.to(body, { y: 14, duration: 2.6, ease: 'sine.inOut', repeat: -1, yoyo: true });
+        gsap.to(body, { x: 10, rotation: 5, duration: 3.4, ease: 'sine.inOut', repeat: -1, yoyo: true });
+      });
+      gsap.utils.toArray('[data-reveal]').forEach((el) => {
+        gsap.from(el, { autoAlpha: 0, y: 36, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 92%' } });
+      });
+      const vases = document.querySelector('[data-vases]');
+      if (vases) vases.classList.add('is-in');
+    };
+    const fonts = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+    Promise.race([fonts, new Promise((r) => setTimeout(r, 1200))]).then(() => requestAnimationFrame(reveal));
+    setupBasics();
   }
 
   // Valida el pedido y lo abre en WhatsApp con el mensaje ya armado.
