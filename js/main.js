@@ -43,10 +43,14 @@
   fitBoard();
   window.addEventListener('resize', () => { fitBoard(); if (hasGsap) ScrollTrigger.refresh(); });
 
-  /* ---------- Smooth scroll (Lenis) ---------- */
+  /* ---------- Smooth scroll (Lenis) ----------
+     Solo con mouse: en pantallas tactiles el scroll nativo del sistema es mas
+     fluido (lo mueve el compositor, no JavaScript) y no gasta bateria.
+     `lerp` alto = la pagina alcanza el destino en ~250 ms en vez de ~770 ms,
+     asi se siente inmediata sin perder el suavizado de la rueda. */
   let lenis = null;
-  if (!reduceMotion && typeof window.Lenis !== 'undefined') {
-    lenis = new window.Lenis({ duration: 1.15, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+  if (!reduceMotion && finePointer && typeof window.Lenis !== 'undefined') {
+    lenis = new window.Lenis({ lerp: 0.35, wheelMultiplier: 1 });
     lenis.stop();
     if (hasGsap) {
       lenis.on('scroll', ScrollTrigger.update);
@@ -214,17 +218,43 @@
 
   if (reduceMotion) return;
 
+  /* ---------- Rendimiento del scroll ----------
+     Dos reglas para todo lo que sigue:
+     1. `once: true` en las animaciones de entrada. No cambia nada a la vista
+        (ya se reproducian una sola vez), pero el disparador se destruye en cuanto
+        se usa, asi que la lista que el navegador revisa en cada scroll se vacia sola.
+     2. Nada de disparadores para piezas ocultas: en celular las lineas, chinches,
+        bandas y destellos son `display: none`, pero igual se les creaba uno. */
+  const visible = (el) => !!(el && el.offsetParent !== null);
+
+  /* Pausa lo que no se ve: las mariposas, los jarrones, los petalos y las flores
+     se mueven con animaciones que el navegador sigue dibujando aunque esten fuera
+     de pantalla. Al salir de la vista se pausan y al volver se reanudan. */
+  const mirador = 'IntersectionObserver' in window ? new IntersectionObserver((entradas) => {
+    entradas.forEach((e) => {
+      const dentro = e.isIntersecting;
+      e.target.classList.toggle('is-paused', !dentro);
+      const tws = e.target.__tweens;
+      if (tws) tws.forEach((t) => (dentro ? t.resume() : t.pause()));
+    });
+  }, { rootMargin: '150px' }) : null;
+  const pausarFuera = (el, tweens) => {
+    if (!mirador || !el) return;
+    if (tweens) el.__tweens = (el.__tweens || []).concat(tweens);
+    mirador.observe(el);
+  };
+
   /* ---------- Títulos: palabras que suben ---------- */
   document.querySelectorAll('[data-split]').forEach((el) => {
     if (!canSplit) {
-      gsap.from(el, { autoAlpha: 0, y: 40, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%' } });
+      gsap.from(el, { autoAlpha: 0, y: 40, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
       return;
     }
     fontsReady.then(() => {
       const split = new SplitType(el, { types: 'lines,words', lineClass: 'split-line' });
       gsap.from(split.words, {
         yPercent: 115, duration: 1, ease: 'power4.out', stagger: 0.04,
-        scrollTrigger: { trigger: el, start: 'top 88%' },
+        scrollTrigger: { trigger: el, start: 'top 88%', once: true },
         onComplete: () => split.revert()
       });
     });
@@ -232,7 +262,7 @@
 
   /* ---------- Reveals genéricos ---------- */
   gsap.utils.toArray('[data-reveal]').forEach((el) => {
-    gsap.from(el, { autoAlpha: 0, y: 36, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 90%' } });
+    gsap.from(el, { autoAlpha: 0, y: 36, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 90%', once: true } });
   });
 
   /* ---------- Papeles que caen sobre el tablero ---------- */
@@ -241,34 +271,34 @@
     const rot = parseFloat(el.dataset.rot) || 0;
     gsap.fromTo(el,
       { autoAlpha: 0, y: -50, rotation: rot + (i % 2 ? 7 : -7) },
-      { autoAlpha: 1, y: 0, rotation: rot, duration: 1.1, ease: 'back.out(1.3)', scrollTrigger: { trigger: el, start: 'top 90%' } });
+      { autoAlpha: 1, y: 0, rotation: rot, duration: 1.1, ease: 'back.out(1.3)', scrollTrigger: { trigger: el, start: 'top 90%', once: true } });
   });
 
   /* ---------- Líneas y bandas que se dibujan ---------- */
-  gsap.utils.toArray('.board > section:not(.hero) .line--h').forEach((el) => {
-    gsap.from(el, { scaleX: 0, duration: 1.4, ease: 'expo.inOut', scrollTrigger: { trigger: el, start: 'top 92%' } });
+  gsap.utils.toArray('.board > section:not(.hero) .line--h').filter(visible).forEach((el) => {
+    gsap.from(el, { scaleX: 0, duration: 1.4, ease: 'expo.inOut', scrollTrigger: { trigger: el, start: 'top 92%', once: true } });
   });
-  if (has('.pedir__band')) gsap.from('.pedir__band', { scaleX: 0, transformOrigin: 'left center', duration: 1.2, ease: 'expo.inOut', scrollTrigger: { trigger: '.pedir', start: 'top 75%' } });
+  if (visible(document.querySelector('.pedir__band'))) gsap.from('.pedir__band', { scaleX: 0, transformOrigin: 'left center', duration: 1.2, ease: 'expo.inOut', scrollTrigger: { trigger: '.pedir', start: 'top 75%', once: true } });
 
   /* ---------- Chinches y destellos ---------- */
-  gsap.utils.toArray('[data-pin]').forEach((el) => {
-    gsap.from(el, { scale: 0, duration: 0.7, ease: 'back.out(2)', scrollTrigger: { trigger: el, start: 'top 92%' } });
+  gsap.utils.toArray('[data-pin]').filter(visible).forEach((el) => {
+    gsap.from(el, { scale: 0, duration: 0.7, ease: 'back.out(2)', scrollTrigger: { trigger: el, start: 'top 92%', once: true } });
   });
-  gsap.utils.toArray('[data-sparkle]').forEach((el, i) => {
-    gsap.to(el, { scale: 0.55, rotation: 45, opacity: 0.6, duration: 1.2 + i * 0.3, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: i * 0.4 });
+  gsap.utils.toArray('[data-sparkle]').filter(visible).forEach((el, i) => {
+    pausarFuera(el, [gsap.to(el, { scale: 0.55, rotation: 45, opacity: 0.6, duration: 1.2 + i * 0.3, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: i * 0.4 })]);
   });
 
   /* ---------- Tarjetas de tortas ---------- */
   gsap.set('[data-card]', { autoAlpha: 0 });
   ScrollTrigger.batch('[data-card]', {
-    start: 'top 90%',
+    start: 'top 90%', once: true,
     onEnter: (batch) => gsap.fromTo(batch,
       { autoAlpha: 0, y: 60, rotation: (i) => (i % 2 ? 3 : -3) },
       { autoAlpha: 1, y: 0, rotation: 0, duration: 1, ease: 'power4.out', stagger: 0.12, overwrite: true })
   });
 
   /* ---------- Arcos fotográficos ---------- */
-  if (has('[data-arch]')) gsap.from('[data-arch]', { clipPath: 'inset(100% 0% 0% 0%)', duration: 1.3, ease: 'expo.inOut', scrollTrigger: { trigger: '[data-arch]', start: 'top 85%' } });
+  if (has('[data-arch]')) gsap.from('[data-arch]', { clipPath: 'inset(100% 0% 0% 0%)', duration: 1.3, ease: 'expo.inOut', scrollTrigger: { trigger: '[data-arch]', start: 'top 85%', once: true } });
 
   /* ---------- Mariposas: vuelo suave + reaccionan al scroll ---------- */
   setupButterflies();
@@ -280,8 +310,10 @@
     // ni con el vuelo del scroll, que mueven la capa externa (.fly).
     const float = (fly) => {
       const body = fly.querySelector('.fly__body');
-      gsap.to(body, { y: 14, duration: 2.6, ease: 'sine.inOut', repeat: -1, yoyo: true });
-      gsap.to(body, { x: 10, rotation: 5, duration: 3.4, ease: 'sine.inOut', repeat: -1, yoyo: true });
+      pausarFuera(fly, [
+        gsap.to(body, { y: 14, duration: 2.6, ease: 'sine.inOut', repeat: -1, yoyo: true }),
+        gsap.to(body, { x: 10, rotation: 5, duration: 3.4, ease: 'sine.inOut', repeat: -1, yoyo: true })
+      ]);
     };
     flies.forEach((fly) => { if (fly !== heroFly) float(fly); });
     setupButterflies.floatHero = () => float(heroFly);
@@ -303,11 +335,13 @@
     }
     // Al hacer scroll aletean rápido, como asustadas
     let flyTimer;
+    let flying = false;
     ScrollTrigger.create({
       onUpdate: () => {
-        flies.forEach((f) => f.classList.add('is-flying'));
+        // Solo se toca el DOM al entrar y al salir del estado, no en cada cuadro.
+        if (!flying) { flying = true; flies.forEach((f) => f.classList.add('is-flying')); }
         clearTimeout(flyTimer);
-        flyTimer = setTimeout(() => flies.forEach((f) => f.classList.remove('is-flying')), 500);
+        flyTimer = setTimeout(() => { flying = false; flies.forEach((f) => f.classList.remove('is-flying')); }, 500);
       }
     });
   }
@@ -315,6 +349,7 @@
   /* ---------- Jarrones: entran uno a uno y luego se mecen ---------- */
   const vases = document.querySelector('[data-vases]');
   if (vases) {
+    pausarFuera(vases);
     const parts = vases.querySelectorAll('.vases__v');
     gsap.set(parts, { yPercent: 40, autoAlpha: 0 });
     gsap.set('.vases__shelf', { xPercent: -100 });
@@ -338,7 +373,8 @@
   }
 
   /* ---------- Flores del hero: se mecen con el viento ---------- */
-  if (has('.hero__flowers')) gsap.to('.hero__flowers', { rotation: 2.2, duration: 3.2, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: 2.2 });
+  if (has('.hero__flowers')) pausarFuera(document.querySelector('.hero__flowers'),
+    [gsap.to('.hero__flowers', { rotation: 2.2, duration: 3.2, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: 2.2 })]);
 
   /* ---------- Parallax suave de las piezas al hacer scroll (escritorio) ---------- */
   if (!lite) {
@@ -383,6 +419,7 @@
       if (!links.classList.contains('is-open')) return;
       links.classList.remove('is-open');
       nav.classList.remove('is-menu-open');
+      root.classList.remove('is-menu-open');
       burger.setAttribute('aria-expanded', 'false');
       burger.setAttribute('aria-label', 'Abrir menú');
       if (lenis) lenis.start();
@@ -391,6 +428,7 @@
       const open = !links.classList.contains('is-open');
       links.classList.toggle('is-open', open);
       nav.classList.toggle('is-menu-open', open);
+      root.classList.toggle('is-menu-open', open);
       burger.setAttribute('aria-expanded', String(open));
       burger.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
       if (lenis) open ? lenis.stop() : lenis.start();
@@ -401,8 +439,16 @@
     // en pantallas táctiles (sin mouse) vuelve al hacer scroll hacia arriba.
     const sections = ['inicio', 'tortas', 'pedir', 'historia', 'contacto'].map((id) => document.getElementById(id));
     const navLinks = links.querySelectorAll('a');
+    // Posicion de cada seccion, cacheada: leer getBoundingClientRect en cada
+    // cuadro obligaba al navegador a recalcular el layout mientras se hace scroll.
+    let tops = [];
+    const measure = () => { tops = sections.map((s) => (s ? s.getBoundingClientRect().top + window.scrollY : Infinity)); };
+    measure();
+    window.addEventListener('resize', measure);
+    if (typeof window.ScrollTrigger !== 'undefined') ScrollTrigger.addEventListener('refresh', measure);
     const HIDE_AFTER = 160;
     let lastY = 0;
+    let lastSection = '';
     let scrollingUp = false;
     let pointerNearTop = false;
     const updateNav = () => {
@@ -430,9 +476,13 @@
         updateNav();
 
         if (!isHome) return;
+        const marca = y + window.innerHeight * 0.45;
         let current = 'inicio';
-        sections.forEach((s) => { if (s && s.getBoundingClientRect().top < window.innerHeight * 0.45) current = s.id; });
-        navLinks.forEach((a) => a.classList.toggle('is-active', a.getAttribute('href') === '#' + current));
+        for (let i = 0; i < sections.length; i++) if (sections[i] && tops[i] < marca) current = sections[i].id;
+        if (current !== lastSection) {
+          lastSection = current;
+          navLinks.forEach((a) => a.classList.toggle('is-active', a.getAttribute('href') === '#' + current));
+        }
       });
     };
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -503,7 +553,7 @@
       tl.from('[data-in]', { autoAlpha: 0, y: 40, duration: 0.9, ease: 'power3.out', stagger: 0.08 }, 0.35)
         .from('[data-in-drop]', { autoAlpha: 0, y: -60, rotation: (i) => (i % 2 ? 8 : -8), duration: 1.1, ease: 'back.out(1.4)', stagger: 0.12 }, 0.5)
         .from('.listen .line--h', { scaleX: 0, duration: 1.2, ease: 'expo.inOut' }, 0.3);
-      gsap.utils.toArray('[data-sparkle]').forEach((el, i) => {
+      gsap.utils.toArray('[data-sparkle]').filter((el) => el.offsetParent !== null).forEach((el, i) => {
         gsap.to(el, { scale: 0.55, rotation: 45, opacity: 0.6, duration: 1.2 + i * 0.3, ease: 'sine.inOut', repeat: -1, yoyo: true, delay: i * 0.4 });
       });
       gsap.utils.toArray('[data-fly]').forEach((fly) => {
@@ -512,7 +562,7 @@
         gsap.to(body, { x: 10, rotation: 5, duration: 3.4, ease: 'sine.inOut', repeat: -1, yoyo: true });
       });
       gsap.utils.toArray('[data-reveal]').forEach((el) => {
-        gsap.from(el, { autoAlpha: 0, y: 36, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 92%' } });
+        gsap.from(el, { autoAlpha: 0, y: 36, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 92%', once: true } });
       });
       const vases = document.querySelector('[data-vases]');
       if (vases) vases.classList.add('is-in');
@@ -643,8 +693,10 @@
     }, 2000);
     bot.addEventListener('mouseenter', () => { if (!isOpen()) mood('wave'); });
 
-    /* Al hacer scroll, Mili se inclina hacia la web y la sigue con los ojos */
-    if (!hasGsap) return;
+    /* Al hacer scroll, Mili se inclina hacia la web y la sigue con los ojos.
+       Solo con mouse: en celular esto escribia transformaciones sobre su SVG en
+       cada cuadro justo mientras se hace scroll, que es cuando menos sobra el tiempo. */
+    if (!hasGsap || lite) return;
     const leanRot = gsap.quickTo(lean, 'rotation', { duration: 0.45, ease: 'power3.out' });
     const leanX = gsap.quickTo(lean, 'x', { duration: 0.45, ease: 'power3.out' });
     const leanSkew = gsap.quickTo(lean, 'skewX', { duration: 0.45, ease: 'power3.out' });
@@ -679,15 +731,23 @@
       }, 420);
     }
 
+    // Un solo ajuste por cuadro aunque lleguen varios eventos de scroll.
+    let pendiente = 0;
+    let watchRaf = 0;
+    const encolar = (v) => {
+      pendiente = v;
+      if (watchRaf) return;
+      watchRaf = requestAnimationFrame(() => { watchRaf = 0; watch(pendiente); });
+    };
     if (lenis) {
-      lenis.on('scroll', (e) => { if (Math.abs(e.velocity) > 6) watch(e.velocity * 60); });
+      lenis.on('scroll', (e) => { if (Math.abs(e.velocity) > 6) encolar(e.velocity * 60); });
     } else {
       window.addEventListener('scroll', () => {
         const now = performance.now();
         const dt = Math.max(16, now - lastT);
         const v = (window.scrollY - lastScrollY) / dt * 1000;
         lastScrollY = window.scrollY; lastT = now;
-        if (Math.abs(v) > 40) watch(v);
+        if (Math.abs(v) > 40) encolar(v);
       }, { passive: true });
     }
   }

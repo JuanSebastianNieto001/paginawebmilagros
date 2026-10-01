@@ -47,6 +47,8 @@ body {
   overflow-x: hidden;
 }
 html.is-intro, html.is-intro body { overflow: hidden; height: 100%; }
+/* Menu movil abierto: sin Lenis el bloqueo del fondo lo hace el CSS */
+html.is-menu-open, html.is-menu-open body { overflow: hidden; }
 
 a { color: var(--plum); text-decoration: none; transition: color .3s var(--ease); }
 a:hover { color: var(--mauve); }
@@ -632,6 +634,10 @@ html.is-intro .mili { opacity: 0; transform: translateY(30px); pointer-events: n
   .card:hover { transform: none; }
   .beam { display: none; }
 }
+
+/* Piezas fuera de pantalla: el JS les pone esta clase para que el navegador
+   deje de dibujar sus animaciones mientras no se ven */
+.is-paused, .is-paused *, .is-paused::before, .is-paused::after { animation-play-state: paused !important; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }

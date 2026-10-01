@@ -51,7 +51,35 @@ con 28 peticiones a 3 dominios, el sitio y Google Fonts (antes 30 peticiones a 7
 - Las fotos de tortas son recortes cuadrados de 480 px (unos 15–28 KB cada una); los arcos no llevan foto para no tapar el reflejo animado.
 - El favicon es un PNG de 32 px (antes cargaba el logo de 274 KB en cada visita) y el logo del menú va a su tamaño real (120 px).
 - Flores y mariposa recomprimidas (WebP q80).
-- El detector de sección activa del menú se agrupa en un solo cuadro por scroll.
+### Fluidez del scroll
+
+Medido con Chrome controlado por script, con la CPU frenada para imitar equipos lentos.
+
+| | Antes | Ahora |
+|---|---|---|
+| Retardo de la rueda (llega al destino) | 767 ms | 228 ms |
+| Cuadros perdidos, celular gama media (CPU ÷4) | 26 | 14 |
+| Cuadros perdidos, celular lento (CPU ÷6) | 84 | 32 |
+| Recálculo de estilos durante el gesto (CPU ÷6) | 1449 ms | 953 ms |
+
+Qué se hizo:
+
+- **Scroll suave solo con mouse.** Lenis pasa de `duration: 1.15` a `lerp: 0.35`, así la página llega
+  al destino en ~230 ms en vez de ~770 ms. En pantallas táctiles no se usa: el scroll nativo lo mueve
+  el compositor del sistema, que es más fluido y gasta menos batería. Como sin Lenis no hay a quién
+  pedirle que pare, el menú móvil bloquea el fondo con `html.is-menu-open`.
+- **Las animaciones de entrada se pausan fuera de pantalla.** Un `IntersectionObserver` pausa mariposas,
+  jarrones, pétalos, flores y destellos cuando salen de la vista, y los reanuda al volver. El navegador
+  dejaba de verlos pero seguía dibujándolos.
+- **Los disparadores de scroll se destruyen al usarse** (`once: true`). No cambia nada a la vista, porque
+  esas animaciones ya se reproducían una sola vez, pero la lista que el navegador revisa en cada scroll
+  se vacía sola. Tampoco se crean disparadores para piezas que están ocultas en ese tamaño de pantalla.
+- **Mili no sigue el scroll en celular.** Inclinarse y mover los ojos obligaba a redibujar su SVG en cada
+  cuadro justo mientras se hace scroll. Con mouse se conserva; en táctil mantiene sus gestos, su globo y
+  su panel.
+- El menú calcula la posición de las secciones una sola vez en vez de medirlas en cada cuadro,
+  y solo reescribe el enlace activo cuando cambia de sección.
+- Las mariposas y la inclinación de Mili tocan el DOM solo al cambiar de estado, no en cada cuadro.
 - En pantallas táctiles ya se desactivan desenfoques, sombras filtradas y haces de luz; respeta `prefers-reduced-motion`.
 
 ## Ver en local
