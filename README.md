@@ -10,6 +10,7 @@ te-escuchamos.html      Página "Te escuchamos": sugerencias y comentarios
 css/styles.css          Estilos: lienzo de 1440px escalado en escritorio, flujo apilado en celular
 js/main.js              Intro, transiciones, animaciones y Mili
 assets/img/             Logo, mariposa, flores y jarrones (WebP)
+assets/img/tortas/      Fotos de tortas tomadas del Instagram @milagros_tortas_tematica (WebP 880×1100, recorte cuadrado *-card y fondo desenfocado *-bg)
 assets/video/           Video de intro (intro-milagros-v4.mp4)
 design/                 Exports originales de los diseños (referencia)
 ```
@@ -46,12 +47,28 @@ Es un sitio estático. Abre `index.html` con un servidor local, por ejemplo:
 npx serve .
 ```
 
+## Fotos
+
+Las fotos de `assets/img/tortas/` salen de las portadas de los reels de
+[@milagros_tortas_tematica](https://www.instagram.com/milagros_tortas_tematica/), recortadas en 4:5 (880×1100).
+Cada tarjeta usa un recorte cuadrado (`*-card.webp`, 800×800) completo (`object-fit: contain`) sobre su propio fondo desenfocado (`*-bg.webp`, 90×60),
+porque las portadas son verticales y las tarjetas apaisadas. Los arcos (hero e historia) la usan a sangre (`cover`).
+
+| Lugar              | Archivo                      | Reel            |
+|--------------------|------------------------------|-----------------|
+| Hero (destacada)   | torta-80-cumpleanos.webp     | Dd2ck3XRKXd     |
+| Cumpleaños         | torta-hello-30.webp          | DduintJzdES     |
+| Infantiles         | torta-monsters.webp          | DdsEUEAKAV9     |
+| Personajes         | torta-cars.webp              | DdjuEhRncaP     |
+| Baby shower        | torta-baby-shower.webp       | Dc2K4ijCC04     |
+| Fanáticos          | torta-futbol-river.webp      | DdIO0ryhDj-     |
+| Videojuegos        | torta-super-mario.webp       | DcxHcJvEa79     |
+| Historia           | torta-bluey.webp             | DdC-MBBAiA-     |
+
+Para cambiar una foto, reemplaza el `<img>` dentro del bloque `.ph` correspondiente (y su `background-image` inline en las tarjetas).
+
 ## Pendiente
 
-Las fotos son marcadores de posición (`.ph`). Para poner una foto real, agrega un `<img>` dentro del bloque `.ph` correspondiente:
-
-```html
-<div class="ph ph--rose"><img src="assets/img/torta-cumple.jpg" alt="Torta de cumpleaños"></div>
-```
-
-También falta completar la ciudad en la sección de contacto.
+- Foto real de Milagros en su cocina para el arco de "Nuestra historia" (hoy lleva la torta de Bluey).
+- Foto de una torta de boda: en el Instagram no había, así que la tarjeta "Bodas" pasó a "Personajes".
+- Completar la ciudad en la sección de contacto.
