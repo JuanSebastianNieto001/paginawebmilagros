@@ -79,6 +79,9 @@ conservan el degradado con el reflejo animado.
 | Fanáticos     | torta-futbol-river-card.webp  | DdIO0ryhDj-   |
 | Videojuegos   | torta-super-mario-card.webp   | DcxHcJvEa79   |
 
+La portada del reel de Super Mario venía con poca luz, así que se le subió la exposición escalando
+los tres canales en la misma proporción (se conservan tono y saturación) hasta igualar el brillo de las demás.
+
 Para cambiar una foto, reemplaza el `<img>` dentro del bloque `.ph` correspondiente (y su `background-image` inline).
 
 ## Pendiente
