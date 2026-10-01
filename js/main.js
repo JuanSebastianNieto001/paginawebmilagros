@@ -418,16 +418,22 @@
       }, { passive: true });
       document.documentElement.addEventListener('mouseleave', () => { pointerNearTop = false; updateNav(); });
     }
+    let scrollQueued = false;
     const onScroll = () => {
-      const y = window.scrollY;
-      if (Math.abs(y - lastY) > 4) scrollingUp = y < lastY;
-      lastY = y;
-      updateNav();
+      if (scrollQueued) return;
+      scrollQueued = true;
+      requestAnimationFrame(() => {
+        scrollQueued = false;
+        const y = window.scrollY;
+        if (Math.abs(y - lastY) > 4) scrollingUp = y < lastY;
+        lastY = y;
+        updateNav();
 
-      if (!isHome) return;
-      let current = 'inicio';
-      sections.forEach((s) => { if (s && s.getBoundingClientRect().top < window.innerHeight * 0.45) current = s.id; });
-      navLinks.forEach((a) => a.classList.toggle('is-active', a.getAttribute('href') === '#' + current));
+        if (!isHome) return;
+        let current = 'inicio';
+        sections.forEach((s) => { if (s && s.getBoundingClientRect().top < window.innerHeight * 0.45) current = s.id; });
+        navLinks.forEach((a) => a.classList.toggle('is-active', a.getAttribute('href') === '#' + current));
+      });
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();

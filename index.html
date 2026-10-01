@@ -6,11 +6,15 @@
   <title>Milagros Tortas Temáticas — Sabor de hogar</title>
   <meta name="description" content="Tortas temáticas artesanales hechas a mano en Colombia. Cumpleaños, bodas, baby shower e infantiles con el sabor de la receta de nuestras abuelas.">
   <meta name="theme-color" content="#48133d">
-  <link rel="icon" type="image/png" href="assets/img/logo-milagros.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="assets/img/favicon-192.png">
 
   <meta property="og:title" content="Milagros Tortas Temáticas">
   <meta property="og:description" content="Tortas temáticas con el sabor de hogar, retomando la receta de nuestras abuelas.">
-  <meta property="og:image" content="assets/img/tortas/torta-80-cumpleanos.webp">
+  <meta property="og:image" content="https://paginawebmilagros.vercel.app/assets/img/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:type" content="website">
   <link rel="preload" href="assets/img/mariposa.webp" as="image" type="image/webp">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,7 +25,10 @@
 
   <!-- ============ INTRO ============ -->
   <div id="intro" class="intro" aria-label="Introducción Milagros Tortas Temáticas">
-    <video id="introVideo" class="intro__video" src="assets/video/intro-milagros-v4.mp4" muted playsinline preload="auto" disablepictureinpicture></video>
+    <video id="introVideo" class="intro__video" muted playsinline preload="auto" disablepictureinpicture>
+      <source src="assets/video/intro-milagros-1080.mp4" type="video/mp4" media="(min-width: 1001px)">
+      <source src="assets/video/intro-milagros-720.mp4" type="video/mp4">
+    </video>
     <div class="intro__veil"></div>
     <div class="intro__progress"><span></span></div>
     <div class="intro__curtain" aria-hidden="true">
@@ -61,7 +68,7 @@
     <!-- ============ NAVEGACIÓN ============ -->
     <header class="nav" id="nav">
       <a href="#inicio" class="brand" data-scroll-to>
-        <img src="assets/img/logo-milagros.webp" alt="Logo Milagros Tortas Temáticas" width="52" height="50">
+        <img src="assets/img/logo-milagros-nav.webp" alt="Logo Milagros Tortas Temáticas" width="52" height="50" decoding="async">
         <span class="brand__script">Milagros</span>
       </a>
       <nav class="nav__links" id="navLinks" aria-label="Principal">
@@ -113,8 +120,8 @@
 
         <figure class="arch hero__arch" data-hero="arch">
           <div class="arch__inner ph">
-            <img src="assets/img/tortas/torta-80-cumpleanos.webp" alt="Torta de cumpleaños número 80 con flores doradas y esferas negras y blancas" width="880" height="1100" fetchpriority="high" decoding="async">
             <span class="sheen" aria-hidden="true"></span>
+            <span class="ph__label">Foto — torta destacada</span>
           </div>
         </figure>
 
@@ -158,10 +165,10 @@
           <p>Cada torta se diseña desde cero contigo: sabor, tamaño, colores y el personaje o momento que quieres celebrar.</p>
           <span class="script plum__hash">#tortaspersonalizadas</span>
           <div class="vases" data-vases aria-hidden="true">
-            <img class="vases__shelf" src="assets/img/jarrones.webp" alt="" width="900" height="614" decoding="async">
-            <img class="vases__v vases__v--1" src="assets/img/jarrones.webp" alt="" width="900" height="614" decoding="async">
-            <img class="vases__v vases__v--2" src="assets/img/jarrones.webp" alt="" width="900" height="614" decoding="async">
-            <img class="vases__v vases__v--3" src="assets/img/jarrones.webp" alt="" width="900" height="614" decoding="async">
+            <img class="vases__shelf" src="assets/img/jarrones.webp" alt="" width="900" height="614" decoding="async" loading="lazy">
+            <img class="vases__v vases__v--1" src="assets/img/jarrones.webp" alt="" width="900" height="614" decoding="async" loading="lazy">
+            <img class="vases__v vases__v--2" src="assets/img/jarrones.webp" alt="" width="900" height="614" decoding="async" loading="lazy">
+            <img class="vases__v vases__v--3" src="assets/img/jarrones.webp" alt="" width="900" height="614" decoding="async" loading="lazy">
             <span class="petal petal--1"></span><span class="petal petal--2"></span><span class="petal petal--3"></span><span class="petal petal--4"></span>
           </div>
         </div>
@@ -169,27 +176,27 @@
 
         <div class="cards">
           <article class="card card--white" data-card>
-            <div class="card__media ph ph--photo" style="background-image:url(assets/img/tortas/torta-hello-30-bg.webp)"><img src="assets/img/tortas/torta-hello-30-card.webp" alt="Torta de cumpleaños en forma de corazón, mitad negra RIP 20s y mitad blanca Hello 30" width="800" height="800" loading="lazy" decoding="async"></div>
+            <div class="card__media ph ph--photo" style="background-image:url(assets/img/tortas/torta-hello-30-bg.webp)"><img src="assets/img/tortas/torta-hello-30-card.webp" alt="Torta de cumpleaños en forma de corazón, mitad negra RIP 20s y mitad blanca Hello 30" width="480" height="480" loading="lazy" decoding="async"></div>
             <div class="card__head"><h3>Cumpleaños</h3><span class="script card__hash">#maspedida</span></div>
           </article>
           <article class="card card--plum" data-card>
-            <div class="card__media ph ph--photo" style="background-image:url(assets/img/tortas/torta-monsters-bg.webp)"><img src="assets/img/tortas/torta-monsters-card.webp" alt="Torta infantil de Monsters Inc. con Mike y Sulley modelados a mano" width="800" height="800" loading="lazy" decoding="async"></div>
+            <div class="card__media ph ph--photo" style="background-image:url(assets/img/tortas/torta-monsters-bg.webp)"><img src="assets/img/tortas/torta-monsters-card.webp" alt="Torta infantil de Monsters Inc. con Mike y Sulley modelados a mano" width="480" height="480" loading="lazy" decoding="async"></div>
             <div class="card__head"><h3>Infantiles</h3><span class="script card__hash">#modeladoamano</span></div>
           </article>
           <article class="card card--pink" data-card>
-            <div class="card__media ph ph--photo" style="background-image:url(assets/img/tortas/torta-cars-bg.webp)"><img src="assets/img/tortas/torta-cars-card.webp" alt="Torta de Cars con Rayo McQueen y bandera a cuadros" width="800" height="800" loading="lazy" decoding="async"></div>
+            <div class="card__media ph ph--photo" style="background-image:url(assets/img/tortas/torta-cars-bg.webp)"><img src="assets/img/tortas/torta-cars-card.webp" alt="Torta de Cars con Rayo McQueen y bandera a cuadros" width="480" height="480" loading="lazy" decoding="async"></div>
             <div class="card__head"><h3>Personajes</h3><span class="script card__hash">#rayomcqueen</span></div>
           </article>
           <article class="card card--white" data-card>
-            <div class="card__media ph ph--photo" style="background-image:url(assets/img/tortas/torta-baby-shower-bg.webp)"><img src="assets/img/tortas/torta-baby-shower-card.webp" alt="Torta de baby shower blanca con conejito rosado y mariposas" width="800" height="800" loading="lazy" decoding="async"></div>
+            <div class="card__media ph ph--photo" style="background-image:url(assets/img/tortas/torta-baby-shower-bg.webp)"><img src="assets/img/tortas/torta-baby-shower-card.webp" alt="Torta de baby shower blanca con conejito rosado y mariposas" width="480" height="480" loading="lazy" decoding="async"></div>
             <div class="card__head"><h3>Baby shower</h3><span class="script card__hash">#pastel</span></div>
           </article>
           <article class="card card--plum" data-card>
-            <div class="card__media ph ph--photo" style="background-image:url(assets/img/tortas/torta-futbol-river-bg.webp)"><img src="assets/img/tortas/torta-futbol-river-card.webp" alt="Torta de fútbol con balón, guayos y escudo de River Plate" width="800" height="800" loading="lazy" decoding="async"></div>
+            <div class="card__media ph ph--photo" style="background-image:url(assets/img/tortas/torta-futbol-river-bg.webp)"><img src="assets/img/tortas/torta-futbol-river-card.webp" alt="Torta de fútbol con balón, guayos y escudo de River Plate" width="480" height="480" loading="lazy" decoding="async"></div>
             <div class="card__head"><h3>Fanáticos</h3><span class="script card__hash">#apedido</span></div>
           </article>
           <article class="card card--white" data-card>
-            <div class="card__media ph ph--photo" style="background-image:url(assets/img/tortas/torta-super-mario-bg.webp)"><img src="assets/img/tortas/torta-super-mario-card.webp" alt="Torta de Super Mario Bros con hongos, Mario y Luigi" width="800" height="800" loading="lazy" decoding="async"></div>
+            <div class="card__media ph ph--photo" style="background-image:url(assets/img/tortas/torta-super-mario-bg.webp)"><img src="assets/img/tortas/torta-super-mario-card.webp" alt="Torta de Super Mario Bros con hongos, Mario y Luigi" width="480" height="480" loading="lazy" decoding="async"></div>
             <div class="card__head"><h3>Videojuegos</h3><span class="script card__hash">#supermario</span></div>
           </article>
         </div>
@@ -236,8 +243,8 @@
         </div>
         <figure class="arch historia__arch" data-arch>
           <div class="arch__inner ph">
-            <img src="assets/img/tortas/torta-bluey.webp" alt="Torta de Bluey y Bingo con arcoíris, globos y el nombre Melissa" width="880" height="1100" loading="lazy" decoding="async">
             <span class="sheen" aria-hidden="true"></span>
+            <span class="ph__label">Foto — Milagros en su cocina</span>
           </div>
         </figure>
         <div class="note historia__note" data-drop data-rot="3">
@@ -367,10 +374,10 @@
   </div>
 
   <!-- Plugins -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/split-type@0.3.4/umd/index.min.js"></script>
+  <script src="js/vendor/gsap.min.js"></script>
+  <script src="js/vendor/ScrollTrigger.min.js"></script>
+  <script src="js/vendor/lenis.min.js"></script>
+  <script src="js/vendor/split-type.min.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

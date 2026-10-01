@@ -9,9 +9,10 @@ index.html              Página principal (diseño collage)
 te-escuchamos.html      Página "Te escuchamos": sugerencias y comentarios
 css/styles.css          Estilos: lienzo de 1440px escalado en escritorio, flujo apilado en celular
 js/main.js              Intro, transiciones, animaciones y Mili
-assets/img/             Logo, mariposa, flores y jarrones (WebP)
-assets/img/tortas/      Fotos de tortas tomadas del Instagram @milagros_tortas_tematica (WebP 880×1100, recorte cuadrado *-card y fondo desenfocado *-bg)
-assets/video/           Video de intro (intro-milagros-v4.mp4)
+assets/img/             Logo, mariposa, flores, jarrones, favicons e imagen para redes (og-image.jpg)
+assets/img/tortas/      Fotos de tortas del Instagram @milagros_tortas_tematica (*-card.webp 480×480 y fondo desenfocado *-bg.webp)
+assets/video/           Video de intro: intro-milagros-1080.mp4 (escritorio) e intro-milagros-720.mp4 (celular)
+js/vendor/              GSAP, ScrollTrigger, Lenis y SplitType alojados aquí (sin CDN externos)
 design/                 Exports originales de los diseños (referencia)
 ```
 
@@ -32,12 +33,26 @@ design/                 Exports originales de los diseños (referencia)
 - En celular se desactivan efectos costosos (desenfoques, recortes animados) para que las animaciones vayan fluidas.
 - Respeta `prefers-reduced-motion`.
 
-## Plugins (vía CDN)
+## Plugins (alojados en `js/vendor/`)
 
-- [GSAP 3 + ScrollTrigger](https://gsap.com/) — animaciones y scroll
-- [Lenis](https://lenis.darkroom.engineering/) — smooth scroll
-- [SplitType](https://github.com/lukePeavey/SplitType) — división de texto en líneas y palabras
+- [GSAP 3.12.5 + ScrollTrigger](https://gsap.com/) — animaciones y scroll
+- [Lenis 1.1.13](https://lenis.darkroom.engineering/) — smooth scroll
+- [SplitType 0.3.4](https://github.com/lukePeavey/SplitType) — división de texto en líneas y palabras
 - Google Fonts: Dancing Script (una sola cursiva ligada y legible para toda la web)
+
+Se sirven desde el mismo dominio para ahorrar tres conexiones a CDN externos en cada visita.
+
+## Rendimiento
+
+Medido con Chrome sin caché: la primera visita baja ~1 MB en escritorio y ~0,8 MB en celular (antes 2,6 MB en ambos),
+con 28 peticiones a 3 dominios, el sitio y Google Fonts (antes 30 peticiones a 7 dominios):
+
+- El video de la intro se recomprimió a 30 fps: 1080p (372 KB) para escritorio y 720p (178 KB) para celular, con `faststart` para que empiece a reproducirse apenas llega el primer tramo.
+- Las fotos de tortas son recortes cuadrados de 480 px (unos 15–28 KB cada una); los arcos no llevan foto para no tapar el reflejo animado.
+- El favicon es un PNG de 32 px (antes cargaba el logo de 274 KB en cada visita) y el logo del menú va a su tamaño real (120 px).
+- Flores y mariposa recomprimidas (WebP q80).
+- El detector de sección activa del menú se agrupa en un solo cuadro por scroll.
+- En pantallas táctiles ya se desactivan desenfoques, sombras filtradas y haces de luz; respeta `prefers-reduced-motion`.
 
 ## Ver en local
 
@@ -50,25 +65,25 @@ npx serve .
 ## Fotos
 
 Las fotos de `assets/img/tortas/` salen de las portadas de los reels de
-[@milagros_tortas_tematica](https://www.instagram.com/milagros_tortas_tematica/), recortadas en 4:5 (880×1100).
-Cada tarjeta usa un recorte cuadrado (`*-card.webp`, 800×800) completo (`object-fit: contain`) sobre su propio fondo desenfocado (`*-bg.webp`, 90×60),
-porque las portadas son verticales y las tarjetas apaisadas. Los arcos (hero e historia) la usan a sangre (`cover`).
+[@milagros_tortas_tematica](https://www.instagram.com/milagros_tortas_tematica/), recortadas en cuadrado (480×480).
+Cada tarjeta muestra la foto completa (`object-fit: contain`) sobre su propio fondo desenfocado (`*-bg.webp`, 90×60),
+porque las portadas son verticales y las tarjetas apaisadas. Los arcos del hero y de la historia no llevan foto:
+conservan el degradado con el reflejo animado.
 
-| Lugar              | Archivo                      | Reel            |
-|--------------------|------------------------------|-----------------|
-| Hero (destacada)   | torta-80-cumpleanos.webp     | Dd2ck3XRKXd     |
-| Cumpleaños         | torta-hello-30.webp          | DduintJzdES     |
-| Infantiles         | torta-monsters.webp          | DdsEUEAKAV9     |
-| Personajes         | torta-cars.webp              | DdjuEhRncaP     |
-| Baby shower        | torta-baby-shower.webp       | Dc2K4ijCC04     |
-| Fanáticos          | torta-futbol-river.webp      | DdIO0ryhDj-     |
-| Videojuegos        | torta-super-mario.webp       | DcxHcJvEa79     |
-| Historia           | torta-bluey.webp             | DdC-MBBAiA-     |
+| Tarjeta       | Archivo                       | Reel          |
+|---------------|-------------------------------|---------------|
+| Cumpleaños    | torta-hello-30-card.webp      | DduintJzdES   |
+| Infantiles    | torta-monsters-card.webp      | DdsEUEAKAV9   |
+| Personajes    | torta-cars-card.webp          | DdjuEhRncaP   |
+| Baby shower   | torta-baby-shower-card.webp   | Dc2K4ijCC04   |
+| Fanáticos     | torta-futbol-river-card.webp  | DdIO0ryhDj-   |
+| Videojuegos   | torta-super-mario-card.webp   | DcxHcJvEa79   |
 
-Para cambiar una foto, reemplaza el `<img>` dentro del bloque `.ph` correspondiente (y su `background-image` inline en las tarjetas).
+Para cambiar una foto, reemplaza el `<img>` dentro del bloque `.ph` correspondiente (y su `background-image` inline).
 
 ## Pendiente
 
-- Foto real de Milagros en su cocina para el arco de "Nuestra historia" (hoy lleva la torta de Bluey).
+- Los arcos del hero y de la historia siguen con marcador de posición (`.ph__label`); si algún día llevan foto, agrega un `<img>` dentro del `.ph`.
 - Foto de una torta de boda: en el Instagram no había, así que la tarjeta "Bodas" pasó a "Personajes".
 - Completar la ciudad en la sección de contacto.
+- Si el sitio pasa a un dominio propio, actualizar la URL absoluta de `og:image` en `index.html`.
