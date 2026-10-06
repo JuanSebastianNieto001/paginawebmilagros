@@ -29,9 +29,11 @@ design/                 Exports originales de los diseños (referencia)
 - **Jarrones**: cada jarrón se recorta del mismo PNG y se mece a su ritmo; hay pétalos que flotan desde la flor y un reflejo de luz que barre el vidrio.
 - **Torta que se arma en la ventana del hero**: la Princesa Jasmine recortada en 6 piezas, cada una con la curva
   del borde real de su piso. Aparece la base, caen los pisos uno a uno con un rebote, llega la lámpara con destellos,
-  se exhibe entera unos segundos y vuelve a empezar. El reflejo de la ventana pasa por encima. Se pausa cuando no se ve
+  y queda entera (unos 2 s, una vez por visita; se repite al recargar). El reflejo de la ventana pasa por encima. Se pausa cuando no se ve
   y, con movimiento reducido, muestra la torta completa quieta. Los cortes están en `armado` dentro de `index.html`
   (atributo `data-pie` = borde inferior de cada pieza, en % del alto).
+- **Torta que se arma en la ventana de la historia**: la Boda en mármol (5 piezas, las orquídeas caen al final),
+  con el mismo mecanismo; se arma una vez cuando la ventana entra en pantalla.
 - **Galería de tortas**: 24 tortas recortadas sin fondo que flotan sobre tarjetas blancas, ciruela y rosadas.
   Se filtran por celebración (Infantiles, Bebés, Quince años, Ceremonias, Para grandes) y se ven de a 6 con flechas.
   Los colores se reparten según la posición para que nunca queden dos iguales juntos, también en celular.
@@ -148,6 +150,5 @@ reasigna el JavaScript según la posición, así que da igual cuál pongas. Las 
 
 ## Pendiente
 
-- El arco de la historia sigue con marcador de posición (`.ph__label`, "Foto — Milagros en su cocina").
 - Completar la ciudad en la sección de contacto.
 - Si el sitio pasa a un dominio propio, actualizar la URL absoluta de `og:image` en `index.html`.

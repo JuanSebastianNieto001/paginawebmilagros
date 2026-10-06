@@ -191,7 +191,7 @@
   gsap.set('.hero__band', { scaleX: 0, transformOrigin: 'left center' });
   gsap.set('.hero__washi', { autoAlpha: 0 });
   gsap.set(heroFly, { autoAlpha: 0, x: -140, y: 60 });
-  const armado = reduceMotion ? null : setupArmado();
+  const armado = reduceMotion ? null : setupArmado(document.querySelector('.hero [data-armado]'));
 
   function heroReveal() {
     const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
@@ -200,7 +200,7 @@
       .to('.hero .line--h', { scaleX: 1, duration: 1.1, ease: 'expo.inOut', stagger: 0.08 }, 0.2)
       .to('.hero .line--v, .hero__thread', { scaleY: 1, duration: 1.1, ease: 'expo.inOut', stagger: 0.08 }, 0.3)
       .to('[data-hero="arch"]', { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.2, ease: 'expo.inOut' }, 0.15)
-      .add(() => { if (armado) armado.empezar(); }, 0.7)
+      .add(() => { if (armado) armado.empezar(); }, 0.5)
       .to('[data-hero="tag"]', { autoAlpha: 1, duration: 0.6, stagger: 0.12 }, 0.4)
       .to('[data-hero="note"]', { autoAlpha: 1, y: 0, rotation: -1.5, duration: 1.1, ease: 'back.out(1.4)' }, 0.55)
       .to(heroFly, { autoAlpha: 1, x: 0, y: 0, duration: 1.4, ease: 'power3.out', onComplete: () => setupButterflies.floatHero && setupButterflies.floatHero() }, 0.5)
@@ -296,6 +296,10 @@
     gsap.set(galeria.visibles(), { autoAlpha: 0 });
     ScrollTrigger.create({ trigger: '[data-gallery]', start: 'top 88%', once: true, onEnter: () => galeria.entrar(galeria.visibles()) });
   }
+
+  /* ---------- Torta que se arma en la ventana de la historia: una vez, al entrar en pantalla ---------- */
+  const armadoHistoria = setupArmado(document.querySelector('.historia [data-armado]'));
+  if (armadoHistoria) ScrollTrigger.create({ trigger: '.historia__arch', start: 'top 70%', once: true, onEnter: () => armadoHistoria.empezar() });
 
   /* ---------- Arcos fotográficos ---------- */
   if (has('[data-arch]')) gsap.from('[data-arch]', { clipPath: 'inset(100% 0% 0% 0%)', duration: 1.3, ease: 'expo.inOut', scrollTrigger: { trigger: '[data-arch]', start: 'top 85%', once: true } });
@@ -585,11 +589,10 @@
 
   /* ---------- Torta que se arma en la ventana del hero ----------
      La misma foto recortada en 6 piezas, cada una con la curva del borde real de su piso.
-     Aparece la base, caen los pisos uno a uno con un pequeño rebote, llega la lámpara con
-     destellos, se exhibe unos segundos ya entera y vuelve a empezar. Se pausa si no se ve.
+     Aparece la base, caen los pisos uno a uno con un pequeño rebote y llega la lámpara con
+     destellos. Ocurre una vez por visita; se pausa si la ventana deja de verse antes de terminar.
      Sin animaciones (o sin GSAP) se muestra la foto completa, quieta. */
-  function setupArmado() {
-    const caja = document.querySelector('[data-armado]');
+  function setupArmado(caja) {
     if (!caja || !hasGsap) return null;
     const piezas = Array.from(caja.querySelectorAll('.armado__pieza'));   // de abajo hacia arriba
     const completa = caja.querySelector('.armado__completa');
@@ -599,28 +602,24 @@
     gsap.set(completa, { autoAlpha: 0 });
     const base = piezas[0];
     const pisos = piezas.slice(1);
-    const tl = gsap.timeline({ paused: true, repeat: -1 });
-    tl.set(completa, { autoAlpha: 0 })
-      .set(piezas, { autoAlpha: 0, yPercent: 0, rotation: 0, scaleX: 1, scaleY: 1 })
-      .fromTo(base, { autoAlpha: 0, yPercent: 8 }, { autoAlpha: 1, yPercent: 0, duration: 0.55, ease: 'power3.out' });
+    // Una sola pasada (~2 s): se vuelve a ver solo al recargar la pagina.
+    const tl = gsap.timeline({ paused: true });
+    tl.set(piezas, { autoAlpha: 0 })
+      .fromTo(base, { autoAlpha: 0, yPercent: 8 }, { autoAlpha: 1, yPercent: 0, duration: 0.35, ease: 'power3.out' });
     pisos.forEach((p, i) => {
       const lampara = i === pisos.length - 1;
+      // cada piso empieza a caer mientras el anterior todavia rebota
       tl.fromTo(p,
-        { autoAlpha: 0, yPercent: lampara ? -34 : -26, rotation: lampara ? -14 : (i % 2 ? 2.5 : -2.5) },
-        { autoAlpha: 1, yPercent: 0, rotation: 0, duration: lampara ? 0.62 : 0.46, ease: 'power2.in' }, '+=0.1')
-        .to(p, { scaleY: 0.93, scaleX: 1.035, duration: 0.07, ease: 'power1.out' })
-        .to(p, { scaleY: 1, scaleX: 1, duration: 0.4, ease: 'elastic.out(1, 0.45)' });
+        { autoAlpha: 0, yPercent: lampara ? -30 : -22, rotation: lampara ? -12 : (i % 2 ? 2.5 : -2.5) },
+        { autoAlpha: 1, yPercent: 0, rotation: 0, duration: lampara ? 0.38 : 0.26, ease: 'power2.in' }, i === 0 ? '-=0.1' : '-=0.16')
+        .to(p, { scaleY: 0.94, scaleX: 1.03, duration: 0.05, ease: 'power1.out' })
+        .to(p, { scaleY: 1, scaleX: 1, duration: 0.3, ease: 'elastic.out(1, 0.5)' });
     });
-    tl.fromTo(chispas, { autoAlpha: 1, scale: 0, rotation: 0 }, { scale: 1, rotation: 90, duration: 0.45, ease: 'back.out(3)', stagger: 0.07 }, '-=0.35')
-      .to(chispas, { autoAlpha: 0, scale: 0.2, duration: 0.35, stagger: 0.07 }, '+=0.1')
-      // ya entera se muestra la foto completa (sin uniones entre piezas) mientras se exhibe
+    tl.fromTo(chispas, { autoAlpha: 1, scale: 0, rotation: 0 }, { scale: 1, rotation: 90, duration: 0.35, ease: 'back.out(3)', stagger: 0.05 }, '-=0.3')
+      .to(chispas, { autoAlpha: 0, scale: 0.2, duration: 0.3, stagger: 0.05 }, '+=0.05')
+      // ya entera queda la foto completa (sin uniones entre piezas)
       .set(completa, { autoAlpha: 1 })
-      .set(piezas, { autoAlpha: 0 })
-      .to({}, { duration: 5.5 })
-      .set(piezas, { autoAlpha: 1 })
-      .set(completa, { autoAlpha: 0 })
-      // se desarma de arriba hacia abajo y vuelve a empezar
-      .to(piezas.slice().reverse(), { yPercent: -18, autoAlpha: 0, duration: 0.4, ease: 'power2.in', stagger: 0.08 });
+      .set(piezas, { autoAlpha: 0 });
     let empezado = false;
     return {
       empezar() {
