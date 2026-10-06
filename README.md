@@ -52,7 +52,11 @@ design/                 Exports originales de los diseños (referencia)
 - [GSAP 3.12.5 + ScrollTrigger](https://gsap.com/) — animaciones y scroll
 - [Lenis 1.1.13](https://lenis.darkroom.engineering/) — smooth scroll
 - [SplitType 0.3.4](https://github.com/lukePeavey/SplitType) — división de texto en líneas y palabras
-- Google Fonts: Dancing Script (una sola cursiva ligada y legible para toda la web)
+- Google Fonts, dos letras pegadas:
+  - **Dancing Script** para lucirse en grande: títulos, nombres de tortas y productos, hashtags, números de paso y el menú móvil.
+  - **Courgette**, más abierta y con letras más grandes, para todo lo que se lee de corrido: párrafos, botones,
+    menú, etiquetas, filtros, formularios y el chat de Mili. Tiene un solo grosor, así que la web desactiva la
+    negrita inventada por el navegador (`font-synthesis: style`).
 
 Se sirven desde el mismo dominio para ahorrar tres conexiones a CDN externos en cada visita.
 
