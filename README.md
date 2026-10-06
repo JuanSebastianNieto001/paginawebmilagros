@@ -32,7 +32,7 @@ design/                 Exports originales de los diseños (referencia)
   y queda entera (unos 2 s, una vez por visita; se repite al recargar). El reflejo de la ventana pasa por encima. Se pausa cuando no se ve
   y, con movimiento reducido, muestra la torta completa quieta. Los cortes están en `armado` dentro de `index.html`
   (atributo `data-pie` = borde inferior de cada pieza, en % del alto).
-- **Torta que se arma en la ventana de la historia**: la Boda en mármol (5 piezas, las orquídeas caen al final),
+- **Torta que se arma en la ventana de la historia**: la Boda en mármol (tambor, tres pisos y las orquídeas al final),
   con el mismo mecanismo; se arma una vez cuando la ventana entra en pantalla.
 - **Galería de tortas**: 24 tortas recortadas sin fondo que flotan sobre tarjetas blancas, ciruela y rosadas.
   Se filtran por celebración (Infantiles, Bebés, Quince años, Ceremonias, Para grandes) y se ven de a 6 con flechas.
@@ -98,6 +98,10 @@ Qué se hizo:
 - El menú calcula la posición de las secciones una sola vez en vez de medirlas en cada cuadro,
   y solo reescribe el enlace activo cuando cambia de sección.
 - Las mariposas y la inclinación de Mili tocan el DOM solo al cambiar de estado, no en cada cuadro.
+- **En táctil, lo decorativo se congela mientras el dedo desliza** (`html.is-scrolling`): aleteo de mariposas,
+  jarrones, pétalos y las animaciones de Mili se pausan y se reanudan 160 ms después de soltar. En un celular lento
+  los cuadros perdidos bajan de 46 a ~30.
+- Dancing Script solo carga los pesos 500 y 600, que son los que se usan; la torta del inicio se precarga.
 - En pantallas táctiles ya se desactivan desenfoques, sombras filtradas y haces de luz; respeta `prefers-reduced-motion`.
 
 ## Ver en local
@@ -125,7 +129,8 @@ npx serve .
    por el color del objeto, para que no aparezca un halo claro sobre las tarjetas ciruela.
 3. **Ajustes a mano**:
    - Spider-Man, Once Caldas y Superhéroes: se quitó el pie oscuro del soporte que asomaba debajo.
-   - Boda en mármol: la base se cortó con una elipse que sigue su curva, sin la cola del plato.
+   - Boda en mármol: se conserva su cuarto piso (el tambor blanco con franjas doradas) y se corta justo en su
+     borde inferior, siguiendo la curva, para quitar solo el reflejo del espejo que tenía debajo.
    - Conejita: se borró la marca de agua "Milagros Tortas Temáticas" que el video tenía sobre el plato.
    - Super Mario: se le subió la exposición (venía con poca luz) escalando los tres canales por igual.
    - Galletas en paleta: se aislaron las seis galletas y sus cintas doradas, sin el celofán.

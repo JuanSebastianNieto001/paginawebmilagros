@@ -492,6 +492,16 @@
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
 
+    // En tactil: marca el documento mientras se hace scroll (el CSS congela lo decorativo)
+    if (lite) {
+      let quieto = 0;
+      window.addEventListener('scroll', () => {
+        if (!quieto) root.classList.add('is-scrolling');
+        clearTimeout(quieto);
+        quieto = setTimeout(() => { quieto = 0; root.classList.remove('is-scrolling'); }, 160);
+      }, { passive: true });
+    }
+
     galeria = setupGallery();
     bindQuoteForm(document.getElementById('quoteForm'), document.getElementById('formHint'), '.field');
     bindQuoteForm(document.getElementById('miliForm'), document.querySelector('.mili-form__hint'), '.mili-field');
