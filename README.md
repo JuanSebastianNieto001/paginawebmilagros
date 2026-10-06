@@ -27,6 +27,11 @@ design/                 Exports originales de los diseños (referencia)
 - **Animaciones**: los papeles caen sobre el tablero al hacer scroll, las líneas se dibujan, los títulos suben palabra por palabra, destellos que titilan, parallax de las piezas.
 - **Mariposas**: aletean (el PNG se divide en dos alas con perspectiva 3D), flotan y vuelan por la pantalla mientras haces scroll.
 - **Jarrones**: cada jarrón se recorta del mismo PNG y se mece a su ritmo; hay pétalos que flotan desde la flor y un reflejo de luz que barre el vidrio.
+- **Torta que se arma en la ventana del hero**: la Princesa Jasmine recortada en 6 piezas, cada una con la curva
+  del borde real de su piso. Aparece la base, caen los pisos uno a uno con un rebote, llega la lámpara con destellos,
+  se exhibe entera unos segundos y vuelve a empezar. El reflejo de la ventana pasa por encima. Se pausa cuando no se ve
+  y, con movimiento reducido, muestra la torta completa quieta. Los cortes están en `armado` dentro de `index.html`
+  (atributo `data-pie` = borde inferior de cada pieza, en % del alto).
 - **Galería de tortas**: 24 tortas recortadas sin fondo que flotan sobre tarjetas blancas, ciruela y rosadas.
   Se filtran por celebración (Infantiles, Bebés, Quince años, Ceremonias, Para grandes) y se ven de a 6 con flechas.
   Los colores se reparten según la posición para que nunca queden dos iguales juntos, también en celular.
@@ -143,6 +148,6 @@ reasigna el JavaScript según la posición, así que da igual cuál pongas. Las 
 
 ## Pendiente
 
-- Los arcos del hero y de la historia siguen con marcador de posición (`.ph__label`); si algún día llevan foto, agrega un `<img>` dentro del `.ph`.
+- El arco de la historia sigue con marcador de posición (`.ph__label`, "Foto — Milagros en su cocina").
 - Completar la ciudad en la sección de contacto.
 - Si el sitio pasa a un dominio propio, actualizar la URL absoluta de `og:image` en `index.html`.

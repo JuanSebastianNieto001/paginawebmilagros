@@ -288,6 +288,16 @@ em { font-style: italic; }
 .hero__tag { top: 36px; left: 260px; padding: 12px 36px; }
 .hero__arch { top: 150px; left: 96px; width: 470px; height: 590px; border-radius: 235px 235px 0 0; }
 .hero__arch .arch__inner { border-radius: 213px 213px 0 0; }
+/* Torta que se arma en la ventana: va recortada, asi el degradado y el reflejo siguen viendose.
+   Apoyada en el borde inferior de la ventana, como si la torta siguiera hacia abajo. */
+.armado { position: absolute; z-index: 1; left: 50%; bottom: 0; height: 91%; transform: translateX(-50%); pointer-events: none; }
+.armado > img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; }
+.armado__pieza { opacity: 0; visibility: hidden; }
+.armado__chispa {
+  position: absolute; z-index: 2; width: 26px; height: 26px; margin: -13px 0 0 -13px;
+  fill: #fff3c4; opacity: 0; filter: drop-shadow(0 0 6px rgba(255, 220, 140, .9));
+}
+.hero__arch .sheen { z-index: 2; }
 .hero__by { top: 150px; left: 760px; }
 .hero__note { top: 300px; left: 760px; width: 470px; height: 360px; padding: 56px 48px; display: flex; flex-direction: column; gap: 18px; --rot: -1.5deg; }
 .note__text { margin: 0; font-family: var(--serif); font-size: 54px; line-height: 1.05; color: var(--plum); }
