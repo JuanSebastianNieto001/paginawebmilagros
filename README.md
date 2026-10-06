@@ -10,7 +10,9 @@ te-escuchamos.html      Página "Te escuchamos": sugerencias y comentarios
 css/styles.css          Estilos: lienzo de 1440px escalado en escritorio, flujo apilado en celular
 js/main.js              Intro, transiciones, animaciones y Mili
 assets/img/             Logo, mariposa, flores, jarrones, favicons e imagen para redes (og-image.jpg)
-assets/img/tortas/      Fotos de tortas del Instagram @milagros_tortas_tematica (*-card.webp 480×480 y fondo desenfocado *-bg.webp)
+assets/img/tortas/      24 tortas recortadas sin fondo (WebP con transparencia, máx. 440×640)
+assets/img/productos/   7 productos recortados sin fondo (WebP con transparencia, máx. 560×420)
+_fotos-originales/      Fotos originales de WhatsApp y recortes en PNG. Viven en el repo pero no se publican (.vercelignore)
 assets/video/           Video de intro: intro-milagros-1080.mp4 (escritorio) e intro-milagros-720.mp4 (celular)
 js/vendor/              GSAP, ScrollTrigger, Lenis y SplitType alojados aquí (sin CDN externos)
 design/                 Exports originales de los diseños (referencia)
@@ -25,6 +27,11 @@ design/                 Exports originales de los diseños (referencia)
 - **Animaciones**: los papeles caen sobre el tablero al hacer scroll, las líneas se dibujan, los títulos suben palabra por palabra, destellos que titilan, parallax de las piezas.
 - **Mariposas**: aletean (el PNG se divide en dos alas con perspectiva 3D), flotan y vuelan por la pantalla mientras haces scroll.
 - **Jarrones**: cada jarrón se recorta del mismo PNG y se mece a su ritmo; hay pétalos que flotan desde la flor y un reflejo de luz que barre el vidrio.
+- **Galería de tortas**: 24 tortas recortadas sin fondo que flotan sobre tarjetas blancas, ciruela y rosadas.
+  Se filtran por celebración (Infantiles, Bebés, Quince años, Ceremonias, Para grandes) y se ven de a 6 con flechas.
+  Los colores se reparten según la posición para que nunca queden dos iguales juntos, también en celular.
+  Las fotos ocultas no se descargan hasta que se muestran.
+- **Más antojos**: sección con cupcakes, ramo de fresas, caja sorpresa, cake pops y galletas, en notas de papel con chinche.
 - **Te escuchamos**: página aparte (enlace en el menú) donde la gente elige el tipo de mensaje, califica con corazones y escribe su sugerencia; se envía por WhatsApp. Entre páginas hay una transición de cortina, y al volver a la portada desde ahí se salta el video y baja a la sección elegida.
 - **Formulario → WhatsApp**: arma el mensaje de cotización y abre WhatsApp. Valida que la fecha tenga mínimo 3 días de anticipación.
 - **Mili, la tortica asistente**: siempre abajo a la derecha. Cada 2 segundos hace algo distinto (salta, baila, gira, saluda, guiña, mira alrededor…) y, mientras haces scroll, se inclina hacia la web y la sigue con los ojos. Muestra globos de diálogo y al tocarla abre un panel con WhatsApp, Instagram y un formulario para pedir la torta.
@@ -92,29 +99,50 @@ npx serve .
 
 ## Fotos
 
-Las fotos de `assets/img/tortas/` salen de las portadas de los reels de
-[@milagros_tortas_tematica](https://www.instagram.com/milagros_tortas_tematica/), recortadas en cuadrado (480×480).
-Cada tarjeta muestra la foto completa (`object-fit: contain`) sobre su propio fondo desenfocado (`*-bg.webp`, 90×60),
-porque las portadas son verticales y las tarjetas apaisadas. Los arcos del hero y de la historia no llevan foto:
-conservan el degradado con el reflejo animado.
+### De dónde salen
 
-| Tarjeta       | Archivo                       | Reel          |
-|---------------|-------------------------------|---------------|
-| Cumpleaños    | torta-hello-30-card.webp      | DduintJzdES   |
-| Infantiles    | torta-monsters-card.webp      | DdsEUEAKAV9   |
-| Personajes    | torta-cars-card.webp          | DdjuEhRncaP   |
-| Baby shower   | torta-baby-shower-card.webp   | Dc2K4ijCC04   |
-| Fanáticos     | torta-futbol-river-card.webp  | DdIO0ryhDj-   |
-| Videojuegos   | torta-super-mario-card.webp   | DcxHcJvEa79   |
+- 26 fotos enviadas por WhatsApp (octubre 2026): 19 tortas y los 7 productos. Están en `_fotos-originales/whatsapp/`
+  con un nombre claro (`02-spiderman.jpeg`…). Llegaron 28 archivos; la 06 y la 07 eran copias idénticas de la 05.
+- 5 portadas de reels de [@milagros_tortas_tematica](https://www.instagram.com/milagros_tortas_tematica/):
+  Adiós veintes, River Plate, Super Mario, Conejita y mariposas, Bluey y Bingo.
 
-La portada del reel de Super Mario venía con poca luz, así que se le subió la exposición escalando
-los tres canales en la misma proporción (se conservan tono y saturación) hasta igualar el brillo de las demás.
+### Cómo se recortaron
 
-Para cambiar una foto, reemplaza el `<img>` dentro del bloque `.ph` correspondiente (y su `background-image` inline).
+1. **Fondo**: [BiRefNet](https://github.com/ZhengPeng7/BiRefNet) (vía `rembg`, modelo `birefnet-general`).
+   Para Rayo McQueen y Barril de 60 se usó `birefnet-massive`, que conserva entero el plato giratorio.
+2. **Retoque de bordes**: se quitan motas sueltas y se reemplaza el color de la pared que queda en el contorno
+   por el color del objeto, para que no aparezca un halo claro sobre las tarjetas ciruela.
+3. **Ajustes a mano**:
+   - Spider-Man, Once Caldas y Superhéroes: se quitó el pie oscuro del soporte que asomaba debajo.
+   - Boda en mármol: la base se cortó con una elipse que sigue su curva, sin la cola del plato.
+   - Conejita: se borró la marca de agua "Milagros Tortas Temáticas" que el video tenía sobre el plato.
+   - Super Mario: se le subió la exposición (venía con poca luz) escalando los tres canales por igual.
+   - Galletas en paleta: se aislaron las seis galletas y sus cintas doradas, sin el celofán.
+   - Galletas decoradas: todas tocaban el borde de la foto; se dejó la muelita más completa.
+   - Donde el borde de la foto cortaba el objeto (moño de la caja, palitos de los cake pops) se suavizó con un desvanecido.
+4. **Salida**: PNG maestro de hasta 1400 px en `_fotos-originales/recortes-png/` y WebP con transparencia
+   para la web (25–50 KB cada uno).
+
+Se descartaron Monsters Inc. y Feliz 80 (las marcas de agua y los efectos del video quedaban encima de la torta),
+la Cars del Instagram (la nueva de Rayo McQueen es mejor) y Bodas/Chocolate como categorías sin foto.
+
+### Agregar una torta
+
+Copia el recorte (WebP o PNG con transparencia) en `assets/img/tortas/` y agrega una tarjeta dentro de
+`<!-- GALERIA:INICIO -->` en `index.html`:
+
+```html
+<article class="card" data-card data-cat="infantiles" data-tone="white" hidden>
+  <div class="card__media"><img src="assets/img/tortas/mi-torta.webp" alt="Descripción de la torta" width="440" height="600" loading="lazy" decoding="async"></div>
+  <div class="card__head"><h3>Nombre</h3><span class="script card__hash">#hashtag</span></div>
+</article>
+```
+
+`data-cat` puede ser `infantiles`, `bebes`, `quince`, `ceremonias` o `grandes`. El color (`data-tone`) lo
+reasigna el JavaScript según la posición, así que da igual cuál pongas. Las 6 primeras tarjetas van sin `hidden`.
 
 ## Pendiente
 
 - Los arcos del hero y de la historia siguen con marcador de posición (`.ph__label`); si algún día llevan foto, agrega un `<img>` dentro del `.ph`.
-- Foto de una torta de boda: en el Instagram no había, así que la tarjeta "Bodas" pasó a "Personajes".
 - Completar la ciudad en la sección de contacto.
 - Si el sitio pasa a un dominio propio, actualizar la URL absoluta de `og:image` en `index.html`.

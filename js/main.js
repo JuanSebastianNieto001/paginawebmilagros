@@ -16,6 +16,7 @@
   const isMobileLayout = () => window.innerWidth <= 1000;
   const isHome = !!document.getElementById('intro');
   const has = (sel) => !!document.querySelector(sel);
+  let galeria = null;  // galeria de tortas (filtros + paginas); se arma en setupBasics
 
   /* ---------- Navegación entre páginas ----------
      Al recargar siempre se arranca arriba con la intro. Si se llega desde otra página
@@ -289,13 +290,10 @@
   });
 
   /* ---------- Tarjetas de tortas ---------- */
-  gsap.set('[data-card]', { autoAlpha: 0 });
-  ScrollTrigger.batch('[data-card]', {
-    start: 'top 90%', once: true,
-    onEnter: (batch) => gsap.fromTo(batch,
-      { autoAlpha: 0, y: 60, rotation: (i) => (i % 2 ? 3 : -3) },
-      { autoAlpha: 1, y: 0, rotation: 0, duration: 1, ease: 'power4.out', stagger: 0.12, overwrite: true })
-  });
+  if (galeria) {
+    gsap.set(galeria.visibles(), { autoAlpha: 0 });
+    ScrollTrigger.create({ trigger: '[data-gallery]', start: 'top 88%', once: true, onEnter: () => galeria.entrar(galeria.visibles()) });
+  }
 
   /* ---------- Arcos fotográficos ---------- */
   if (has('[data-arch]')) gsap.from('[data-arch]', { clipPath: 'inset(100% 0% 0% 0%)', duration: 1.3, ease: 'expo.inOut', scrollTrigger: { trigger: '[data-arch]', start: 'top 85%', once: true } });
@@ -437,7 +435,7 @@
 
     // Nav: al bajar desaparece. Con mouse, vuelve al acercar el puntero al borde superior;
     // en pantallas táctiles (sin mouse) vuelve al hacer scroll hacia arriba.
-    const sections = ['inicio', 'tortas', 'pedir', 'historia', 'contacto'].map((id) => document.getElementById(id));
+    const sections = ['inicio', 'tortas', 'antojos', 'pedir', 'historia', 'contacto'].map((id) => document.getElementById(id));
     const navLinks = links.querySelectorAll('a');
     // Posicion de cada seccion, cacheada: leer getBoundingClientRect en cada
     // cuadro obligaba al navegador a recalcular el layout mientras se hace scroll.
@@ -488,10 +486,99 @@
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
 
+    galeria = setupGallery();
     bindQuoteForm(document.getElementById('quoteForm'), document.getElementById('formHint'), '.field');
     bindQuoteForm(document.getElementById('miliForm'), document.querySelector('.mili-form__hint'), '.mili-field');
     bindFeedbackForm(document.getElementById('feedbackForm'));
     setupMili();
+  }
+
+  /* ---------- Galería de tortas: filtros por celebración y páginas de 6 ----------
+     Todas las tarjetas están en el HTML (bueno para buscadores y lectores de pantalla);
+     aquí solo se decide cuáles se ven. Las imágenes ocultas no se descargan hasta mostrarse
+     porque llevan loading="lazy". El color de cada tarjeta se reparte según su posición en
+     la rejilla, para que nunca queden dos iguales lado a lado ni una encima de otra. */
+  function setupGallery() {
+    const grid = document.querySelector('[data-gallery]');
+    if (!grid) return null;
+    const cards = Array.from(grid.querySelectorAll('[data-card]'));
+    const filtros = Array.from(document.querySelectorAll('[data-filter]'));
+    const pager = document.querySelector('[data-pager]');
+    const contador = pager ? pager.querySelector('[data-count]') : null;
+    const TONOS = ['white', 'plum', 'pink'];
+    const POR_PAGINA = 6;
+    const animar = hasGsap && !reduceMotion;
+    let cat = 'todas';
+    let pagina = 0;
+    let ocupado = false;
+
+    const lista = () => cards.filter((c) => cat === 'todas' || c.dataset.cat === cat);
+    const visibles = () => cards.filter((c) => !c.hidden);
+    const columnas = () => getComputedStyle(grid).gridTemplateColumns.split(' ').filter(Boolean).length || 1;
+
+    function pintarTonos(vis) {
+      const cols = columnas();
+      vis.forEach((c, i) => { c.dataset.tone = TONOS[(Math.floor(i / cols) + (i % cols)) % TONOS.length]; });
+    }
+    function mostrar() {
+      const l = lista();
+      const paginas = Math.max(1, Math.ceil(l.length / POR_PAGINA));
+      pagina = ((pagina % paginas) + paginas) % paginas;
+      const vis = l.slice(pagina * POR_PAGINA, pagina * POR_PAGINA + POR_PAGINA);
+      cards.forEach((c) => { c.hidden = vis.indexOf(c) === -1; });
+      pintarTonos(vis);
+      if (pager) pager.hidden = paginas < 2;
+      if (contador) contador.textContent = (pagina + 1) + ' / ' + paginas;
+      return vis;
+    }
+    function entrar(vis, listo) {
+      if (!animar) { if (listo) listo(); return; }
+      gsap.fromTo(vis,
+        { autoAlpha: 0, y: 40, rotation: (i) => (i % 2 ? 2.5 : -2.5) },
+        { autoAlpha: 1, y: 0, rotation: 0, duration: 0.6, ease: 'power4.out', stagger: 0.05, overwrite: true, clearProps: 'transform', onComplete: listo });
+    }
+    function despues() {
+      // En celular la rejilla cambia de alto: se recalculan los disparadores de scroll
+      // y, si la parte de arriba quedo fuera de pantalla, se vuelve a ella.
+      if (!isMobileLayout()) return;
+      if (hasGsap) ScrollTrigger.refresh();
+      if (grid.getBoundingClientRect().top < 0) scrollToTarget(grid);
+    }
+    // El pedido (filtro o pagina) se aplica de inmediato aunque haya una animacion en curso;
+    // si la hay, al terminar se vuelve a dibujar con el ultimo pedido. Asi ningun toque se pierde.
+    let repetir = false;
+    function dibujar() {
+      gsap.to(visibles(), {
+        autoAlpha: 0, y: -16, duration: 0.18, ease: 'power2.in', stagger: 0.02, overwrite: true,
+        onComplete: () => {
+          const vis = mostrar(); despues();
+          entrar(vis, () => { if (repetir) { repetir = false; dibujar(); } else { ocupado = false; } });
+        }
+      });
+    }
+    function cambiar(fn) {
+      fn();
+      if (!animar) { mostrar(); despues(); return; }
+      if (ocupado) { repetir = true; return; }
+      ocupado = true;
+      dibujar();
+    }
+
+    filtros.forEach((b) => b.addEventListener('click', () => {
+      if (b.dataset.filter === cat) return;
+      filtros.forEach((x) => { const on = x === b; x.classList.toggle('is-active', on); x.setAttribute('aria-pressed', String(on)); });
+      cambiar(() => { cat = b.dataset.filter; pagina = 0; });
+    }));
+    if (pager) {
+      pager.querySelector('[data-prev]').addEventListener('click', () => cambiar(() => { pagina -= 1; }));
+      pager.querySelector('[data-next]').addEventListener('click', () => cambiar(() => { pagina += 1; }));
+    }
+    // Si cambia el numero de columnas (girar el celular, redimensionar), se reparten de nuevo los colores
+    let cols = columnas();
+    window.addEventListener('resize', () => { const c = columnas(); if (c !== cols) { cols = c; pintarTonos(visibles()); } });
+
+    mostrar();
+    return { visibles, entrar };
   }
 
   /* ---------- Te escuchamos: sugerencias y comentarios → WhatsApp ---------- */

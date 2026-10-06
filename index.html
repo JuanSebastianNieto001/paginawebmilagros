@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Milagros Tortas Temáticas — Sabor de hogar</title>
-  <meta name="description" content="Tortas temáticas artesanales hechas a mano en Colombia. Cumpleaños, bodas, baby shower e infantiles con el sabor de la receta de nuestras abuelas.">
+  <meta name="description" content="Tortas temáticas artesanales hechas a mano en Colombia: infantiles, quince años, bodas, grados y baby shower, además de cupcakes, fresas cubiertas, cake pops y galletas decoradas.">
   <meta name="theme-color" content="#48133d">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/img/favicon-32.png">
   <link rel="apple-touch-icon" sizes="192x192" href="assets/img/favicon-192.png">
@@ -74,6 +74,7 @@
       <nav class="nav__links" id="navLinks" aria-label="Principal">
         <a href="#inicio" data-scroll-to>Inicio</a>
         <a href="#tortas" data-scroll-to>Tortas</a>
+        <a href="#antojos" data-scroll-to>Antojos</a>
         <a href="#pedir" data-scroll-to>Cómo pedir</a>
         <a href="#historia" data-scroll-to>Historia</a>
         <a href="#contacto" data-scroll-to>Contacto</a>
@@ -174,39 +175,183 @@
         </div>
         <span class="pin tortas__pin" data-pin aria-hidden="true"></span>
 
-        <div class="cards">
-          <article class="card card--white" data-card>
-            <div class="card__media ph ph--photo" style="background-image:url(assets/img/tortas/torta-hello-30-bg.webp)"><img src="assets/img/tortas/torta-hello-30-card.webp" alt="Torta de cumpleaños en forma de corazón, mitad negra RIP 20s y mitad blanca Hello 30" width="480" height="480" loading="lazy" decoding="async"></div>
-            <div class="card__head"><h3>Cumpleaños</h3><span class="script card__hash">#maspedida</span></div>
+        <div class="filters tortas__filters" role="group" aria-label="Filtrar tortas por tipo de celebración">
+          <button type="button" class="filter is-active" data-filter="todas" aria-pressed="true">Todas</button>
+          <button type="button" class="filter" data-filter="infantiles" aria-pressed="false">Infantiles</button>
+          <button type="button" class="filter" data-filter="bebes" aria-pressed="false">Bebés</button>
+          <button type="button" class="filter" data-filter="quince" aria-pressed="false">Quince años</button>
+          <button type="button" class="filter" data-filter="ceremonias" aria-pressed="false">Ceremonias</button>
+          <button type="button" class="filter" data-filter="grandes" aria-pressed="false">Para grandes</button>
+        </div>
+
+        <div class="cards" id="galeria" data-gallery>
+          <!-- GALERIA:INICIO -->
+          <article class="card" data-card data-cat="bebes" data-tone="white">
+            <div class="card__media"><img src="assets/img/tortas/primer-anito.webp" alt="Torta de primer cumpleaños blanca con copos rosados, borlas de colores y un ramo de globos pastel" width="339" height="640" loading="lazy" decoding="async"></div>
+            <div class="card__head"><h3>Mi primer añito</h3><span class="script card__hash">#one</span></div>
           </article>
-          <article class="card card--plum" data-card>
-            <div class="card__media ph ph--photo" style="background-image:url(assets/img/tortas/torta-monsters-bg.webp)"><img src="assets/img/tortas/torta-monsters-card.webp" alt="Torta infantil de Monsters Inc. con Mike y Sulley modelados a mano" width="480" height="480" loading="lazy" decoding="async"></div>
-            <div class="card__head"><h3>Infantiles</h3><span class="script card__hash">#modeladoamano</span></div>
+          <article class="card" data-card data-cat="quince" data-tone="plum">
+            <div class="card__media"><img src="assets/img/tortas/princesa-jasmine.webp" alt="Torta de cuatro pisos turquesa y dorada coronada con la lámpara de Aladino" width="352" height="640" loading="lazy" decoding="async"></div>
+            <div class="card__head"><h3>Princesa Jasmine</h3><span class="script card__hash">#quinceaños</span></div>
           </article>
-          <article class="card card--pink" data-card>
-            <div class="card__media ph ph--photo" style="background-image:url(assets/img/tortas/torta-cars-bg.webp)"><img src="assets/img/tortas/torta-cars-card.webp" alt="Torta de Cars con Rayo McQueen y bandera a cuadros" width="480" height="480" loading="lazy" decoding="async"></div>
-            <div class="card__head"><h3>Personajes</h3><span class="script card__hash">#rayomcqueen</span></div>
+          <article class="card" data-card data-cat="infantiles" data-tone="pink">
+            <div class="card__media"><img src="assets/img/tortas/castillo-princesa.webp" alt="Torta en forma de castillo con torres rosadas y enredaderas de flores" width="440" height="616" loading="lazy" decoding="async"></div>
+            <div class="card__head"><h3>Castillo de princesa</h3><span class="script card__hash">#modeladoamano</span></div>
           </article>
-          <article class="card card--white" data-card>
-            <div class="card__media ph ph--photo" style="background-image:url(assets/img/tortas/torta-baby-shower-bg.webp)"><img src="assets/img/tortas/torta-baby-shower-card.webp" alt="Torta de baby shower blanca con conejito rosado y mariposas" width="480" height="480" loading="lazy" decoding="async"></div>
-            <div class="card__head"><h3>Baby shower</h3><span class="script card__hash">#pastel</span></div>
+          <article class="card" data-card data-cat="ceremonias" data-tone="plum">
+            <div class="card__media"><img src="assets/img/tortas/boda-marmol.webp" alt="Torta de boda de tres pisos con efecto mármol y flores blancas" width="419" height="640" loading="lazy" decoding="async"></div>
+            <div class="card__head"><h3>Boda en mármol</h3><span class="script card__hash">#bodas</span></div>
           </article>
-          <article class="card card--plum" data-card>
-            <div class="card__media ph ph--photo" style="background-image:url(assets/img/tortas/torta-futbol-river-bg.webp)"><img src="assets/img/tortas/torta-futbol-river-card.webp" alt="Torta de fútbol con balón, guayos y escudo de River Plate" width="480" height="480" loading="lazy" decoding="async"></div>
-            <div class="card__head"><h3>Fanáticos</h3><span class="script card__hash">#apedido</span></div>
+          <article class="card" data-card data-cat="grandes" data-tone="pink">
+            <div class="card__media"><img src="assets/img/tortas/harry-potter.webp" alt="Torta de Harry Potter con snitch dorada, varita, gafas y el número 39" width="440" height="508" loading="lazy" decoding="async"></div>
+            <div class="card__head"><h3>Harry Potter</h3><span class="script card__hash">#magia</span></div>
           </article>
-          <article class="card card--white" data-card>
-            <div class="card__media ph ph--photo" style="background-image:url(assets/img/tortas/torta-super-mario-bg.webp)"><img src="assets/img/tortas/torta-super-mario-card.webp" alt="Torta de Super Mario Bros con hongos, Mario y Luigi" width="480" height="480" loading="lazy" decoding="async"></div>
-            <div class="card__head"><h3>Videojuegos</h3><span class="script card__hash">#supermario</span></div>
+          <article class="card" data-card data-cat="infantiles" data-tone="white">
+            <div class="card__media"><img src="assets/img/tortas/stitch.webp" alt="Torta de Stitch con flores, conchas y estrellas de mar" width="440" height="549" loading="lazy" decoding="async"></div>
+            <div class="card__head"><h3>Stitch</h3><span class="script card__hash">#disney</span></div>
           </article>
+          <article class="card" data-card data-cat="infantiles" data-tone="pink" hidden>
+            <div class="card__media"><img src="assets/img/tortas/spiderman.webp" alt="Torta de Spider-Man con telarañas, globos rojos y azules y el número 4" width="440" height="590" loading="lazy" decoding="async"></div>
+            <div class="card__head"><h3>Spider-Man</h3><span class="script card__hash">#superhéroes</span></div>
+          </article>
+          <article class="card" data-card data-cat="quince" data-tone="white" hidden>
+            <div class="card__media"><img src="assets/img/tortas/quince-rosa.webp" alt="Torta de quince años blanca con esferas rosadas y doradas, flores y abanicos" width="434" height="640" loading="lazy" decoding="async"></div>
+            <div class="card__head"><h3>Quince en rosa</h3><span class="script card__hash">#quinceaños</span></div>
+          </article>
+          <article class="card" data-card data-cat="bebes" data-tone="plum" hidden>
+            <div class="card__media"><img src="assets/img/tortas/ositos-globos.webp" alt="Torta de tres pisos celeste con ositos, globos y estrellas" width="377" height="640" loading="lazy" decoding="async"></div>
+            <div class="card__head"><h3>Ositos y globos</h3><span class="script card__hash">#babyshower</span></div>
+          </article>
+          <article class="card" data-card data-cat="ceremonias" data-tone="white" hidden>
+            <div class="card__media"><img src="assets/img/tortas/grado-honores.webp" alt="Torta de grado blanca con birrete, diploma, libros y esferas doradas y negras" width="440" height="491" loading="lazy" decoding="async"></div>
+            <div class="card__head"><h3>Grado con honores</h3><span class="script card__hash">#grados</span></div>
+          </article>
+          <article class="card" data-card data-cat="infantiles" data-tone="plum" hidden>
+            <div class="card__media"><img src="assets/img/tortas/rayo-mcqueen.webp" alt="Torta de Cars roja con Rayo McQueen, Mate, conos y bandera a cuadros" width="440" height="463" loading="lazy" decoding="async"></div>
+            <div class="card__head"><h3>Rayo McQueen</h3><span class="script card__hash">#cars</span></div>
+          </article>
+          <article class="card" data-card data-cat="grandes" data-tone="pink" hidden>
+            <div class="card__media"><img src="assets/img/tortas/barril-60.webp" alt="Torta en forma de barril de cerveza para celebrar 60 años" width="440" height="423" loading="lazy" decoding="async"></div>
+            <div class="card__head"><h3>Barril de 60</h3><span class="script card__hash">#agedtoperfection</span></div>
+          </article>
+          <article class="card" data-card data-cat="infantiles" data-tone="plum" hidden>
+            <div class="card__media"><img src="assets/img/tortas/superheroes.webp" alt="Torta dividida en cuatro superhéroes: Hulk, Batman, Spider-Man y Capitán América" width="435" height="640" loading="lazy" decoding="async"></div>
+            <div class="card__head"><h3>Superhéroes</h3><span class="script card__hash">#héroes</span></div>
+          </article>
+          <article class="card" data-card data-cat="ceremonias" data-tone="pink" hidden>
+            <div class="card__media"><img src="assets/img/tortas/primera-comunion.webp" alt="Torta de primera comunión con niña ángel, paloma y rosas" width="440" height="518" loading="lazy" decoding="async"></div>
+            <div class="card__head"><h3>Primera comunión</h3><span class="script card__hash">#comunión</span></div>
+          </article>
+          <article class="card" data-card data-cat="quince" data-tone="white" hidden>
+            <div class="card__media"><img src="assets/img/tortas/quince-negro.webp" alt="Torta de quince años de tres pisos negra con perlas plateadas" width="339" height="640" loading="lazy" decoding="async"></div>
+            <div class="card__head"><h3>Quince en negro y plata</h3><span class="script card__hash">#quinceaños</span></div>
+          </article>
+          <article class="card" data-card data-cat="infantiles" data-tone="pink" hidden>
+            <div class="card__media"><img src="assets/img/tortas/bluey.webp" alt="Torta de Bluey y Bingo con arcoíris, globos y mariposas" width="440" height="500" loading="lazy" decoding="async"></div>
+            <div class="card__head"><h3>Bluey y Bingo</h3><span class="script card__hash">#bluey</span></div>
+          </article>
+          <article class="card" data-card data-cat="bebes" data-tone="white" hidden>
+            <div class="card__media"><img src="assets/img/tortas/osito-corazon.webp" alt="Torta de dos pisos blanca y lila con un osito que sostiene un corazón dorado" width="377" height="640" loading="lazy" decoding="async"></div>
+            <div class="card__head"><h3>Osito con corazón</h3><span class="script card__hash">#babyshower</span></div>
+          </article>
+          <article class="card" data-card data-cat="grandes" data-tone="plum" hidden>
+            <div class="card__media"><img src="assets/img/tortas/once-caldas.webp" alt="Torta de fútbol con balón, bufanda y escudo del Once Caldas" width="440" height="472" loading="lazy" decoding="async"></div>
+            <div class="card__head"><h3>Once Caldas</h3><span class="script card__hash">#fanáticos</span></div>
+          </article>
+          <article class="card" data-card data-cat="infantiles" data-tone="white" hidden>
+            <div class="card__media"><img src="assets/img/tortas/plim-plim.webp" alt="Torta de dos pisos de Plim Plim con estrellas de colores" width="440" height="630" loading="lazy" decoding="async"></div>
+            <div class="card__head"><h3>Plim Plim</h3><span class="script card__hash">#infantil</span></div>
+          </article>
+          <article class="card" data-card data-cat="ceremonias" data-tone="plum" hidden>
+            <div class="card__media"><img src="assets/img/tortas/grado-preescolar.webp" alt="Torta de grado infantil con lápices de colores, paleta de pintor y birrete" width="440" height="509" loading="lazy" decoding="async"></div>
+            <div class="card__head"><h3>Grado de preescolar</h3><span class="script card__hash">#pequeñosgraduados</span></div>
+          </article>
+          <article class="card" data-card data-cat="infantiles" data-tone="pink" hidden>
+            <div class="card__media"><img src="assets/img/tortas/super-mario.webp" alt="Torta de Super Mario Bros con Mario, Luigi, Yoshi y hongos" width="440" height="532" loading="lazy" decoding="async"></div>
+            <div class="card__head"><h3>Super Mario</h3><span class="script card__hash">#videojuegos</span></div>
+          </article>
+          <article class="card" data-card data-cat="bebes" data-tone="plum" hidden>
+            <div class="card__media"><img src="assets/img/tortas/conejita-mariposas.webp" alt="Torta de baby shower blanca con conejita rosada y mariposas" width="440" height="564" loading="lazy" decoding="async"></div>
+            <div class="card__head"><h3>Conejita y mariposas</h3><span class="script card__hash">#babyshower</span></div>
+          </article>
+          <article class="card" data-card data-cat="grandes" data-tone="pink" hidden>
+            <div class="card__media"><img src="assets/img/tortas/adios-veintes.webp" alt="Torta en forma de corazón, mitad negra con RIP 20s y mitad blanca con Hello 30" width="440" height="474" loading="lazy" decoding="async"></div>
+            <div class="card__head"><h3>Adiós veintes</h3><span class="script card__hash">#hello30</span></div>
+          </article>
+          <article class="card" data-card data-cat="grandes" data-tone="white" hidden>
+            <div class="card__media"><img src="assets/img/tortas/river-plate.webp" alt="Torta de fútbol con balón, guayos y escudo de River Plate" width="440" height="462" loading="lazy" decoding="async"></div>
+            <div class="card__head"><h3>River Plate</h3><span class="script card__hash">#fanáticos</span></div>
+          </article>
+          <!-- GALERIA:FIN -->
+        </div>
+        <div class="pager tortas__pager" data-pager>
+          <button type="button" class="pager__btn" data-prev aria-label="Ver tortas anteriores"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+          <span class="pager__count" data-count aria-live="polite">1 / 1</span>
+          <button type="button" class="pager__btn" data-next aria-label="Ver más tortas"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
         </div>
         <span class="washi tortas__washi" aria-hidden="true"></span>
       </section>
 
-      <!-- ===== 02 CÓMO PEDIR ===== -->
+      <!-- ===== 02 MÁS ANTOJOS ===== -->
+      <section id="antojos" class="antojos">
+        <span class="line line--h antojos__rule" data-line="h"></span>
+        <span class="tag antojos__tag" data-drop data-rot="0">02 · Más antojos</span>
+        <h2 class="h2 antojos__title" data-split>Detalles que también <em>endulzan</em></h2>
+        <svg class="sparkle antojos__sp" data-sparkle><use href="#sparkle"/></svg>
+        <p class="antojos__lead" data-reveal>Cupcakes, fresas, galletas y cajas sorpresa con la misma receta de casa. Para regalar, para la mesa de postres o para darte un gusto.</p>
+        <div class="productos">
+          <!-- PRODUCTOS:INICIO -->
+          <article class="producto" data-tone="plum" data-drop data-rot="-1.5" style="--rot: -1.5deg">
+            <span class="pin pin--top" aria-hidden="true"></span>
+            <div class="producto__media"><img src="assets/img/productos/cupcakes-girasol.webp" alt="Cupcakes decorados con girasoles de fondant y el nombre Mia Luciana" width="449" height="420" loading="lazy" decoding="async"></div>
+            <h3>Cupcakes de girasol</h3>
+            <p>Con flores, nombre y edad hechos a mano.</p>
+          </article>
+          <article class="producto" data-tone="white" data-drop data-rot="1" style="--rot: 1deg">
+            <span class="pin pin--top" aria-hidden="true"></span>
+            <div class="producto__media"><img src="assets/img/productos/ramo-fresas.webp" alt="Ramo de fresas cubiertas con rosas de fondant y moño rosado" width="208" height="420" loading="lazy" decoding="async"></div>
+            <h3>Ramo de fresas</h3>
+            <p>Fresas cubiertas con rosas de fondant, listas para regalar.</p>
+          </article>
+          <article class="producto" data-tone="pink" data-drop data-rot="-0.8" style="--rot: -0.8deg">
+            <span class="pin pin--top" aria-hidden="true"></span>
+            <div class="producto__media"><img src="assets/img/productos/caja-sorpresa.webp" alt="Caja de regalo con mini torta de Feliz cumpleaños, cupcakes con corazones y moño rojo" width="497" height="420" loading="lazy" decoding="async"></div>
+            <h3>Caja sorpresa</h3>
+            <p>Mini torta y cupcakes para una fecha especial.</p>
+          </article>
+          <article class="producto" data-tone="plum" data-drop data-rot="1.4" style="--rot: 1.4deg">
+            <span class="pin pin--top" aria-hidden="true"></span>
+            <div class="producto__media"><img src="assets/img/productos/cake-pops.webp" alt="Cake pops en forma de muelas sonrientes" width="560" height="271" loading="lazy" decoding="async"></div>
+            <h3>Cake pops</h3>
+            <p>Bocados de torta en palito con el tema de tu fiesta.</p>
+          </article>
+          <article class="producto" data-tone="white" data-drop data-rot="-1.2" style="--rot: -1.2deg">
+            <span class="pin pin--top" aria-hidden="true"></span>
+            <div class="producto__media"><img src="assets/img/productos/galletas-paleta.webp" alt="Galletas en paleta decoradas con personajes, empacadas con cinta dorada" width="560" height="415" loading="lazy" decoding="async"></div>
+            <h3>Galletas en paleta</h3>
+            <p>Empacadas una a una, perfectas para sorpresas.</p>
+          </article>
+          <article class="producto" data-tone="pink" data-drop data-rot="0.8" style="--rot: 0.8deg">
+            <span class="pin pin--top" aria-hidden="true"></span>
+            <div class="producto__media"><img src="assets/img/productos/galletas-decoradas.webp" alt="Galletas decoradas en forma de muela con caritas felices" width="460" height="420" loading="lazy" decoding="async"></div>
+            <h3>Galletas decoradas</h3>
+            <p>Glaseadas a mano con la forma que imagines.</p>
+          </article>
+          <article class="producto" data-tone="plum" data-drop data-rot="-0.6" style="--rot: -0.6deg">
+            <span class="pin pin--top" aria-hidden="true"></span>
+            <div class="producto__media"><img src="assets/img/productos/cupcakes-logo.webp" alt="Cupcakes con impresión comestible de un logo y colores verde, blanco y rojo" width="560" height="328" loading="lazy" decoding="async"></div>
+            <h3>Cupcakes con tu logo</h3>
+            <p>Con impresión comestible de tu equipo, marca o foto.</p>
+          </article>
+          <!-- PRODUCTOS:FIN -->
+        </div>
+        <span class="washi antojos__washi" aria-hidden="true"></span>
+      </section>
+
+      <!-- ===== 03 CÓMO PEDIR ===== -->
       <section id="pedir" class="pedir">
         <div class="pedir__band" data-band></div>
-        <span class="tag pedir__tag" data-drop data-rot="0">02 · Cómo pedir</span>
+        <span class="tag pedir__tag" data-drop data-rot="0">03 · Cómo pedir</span>
         <h2 class="h2 pedir__title" data-split>Tres pasos, <em>sin complicaciones</em></h2>
         <svg class="sparkle pedir__sp" data-sparkle><use href="#sparkle"/></svg>
         <div class="steps">
@@ -231,10 +376,10 @@
         </div>
       </section>
 
-      <!-- ===== 03 HISTORIA ===== -->
+      <!-- ===== 04 HISTORIA ===== -->
       <section id="historia" class="historia">
         <span class="line line--h historia__rule" data-line="h"></span>
-        <span class="tag historia__tag" data-drop data-rot="0">03 · Nuestra historia</span>
+        <span class="tag historia__tag" data-drop data-rot="0">04 · Nuestra historia</span>
         <div class="historia__copy">
           <h2 class="h2" data-split>El sabor de nuestras abuelas, <em>en cada porción</em></h2>
           <p class="historia__text" data-reveal>Milagros nació con un deseo sencillo: retomar el sabor de las tortas de la abuela, esas que se hacían con paciencia, ingredientes frescos y mucho cariño. Hoy las vestimos con diseños temáticos, pero por dentro siguen sabiendo a hogar.</p>
@@ -259,10 +404,10 @@
         </div>
       </section>
 
-      <!-- ===== 04 CONTACTO ===== -->
+      <!-- ===== 05 CONTACTO ===== -->
       <section id="contacto" class="contacto">
         <div class="contacto__copy">
-          <span class="kicker" data-reveal>04 · Cotiza tu torta</span>
+          <span class="kicker" data-reveal>05 · Cotiza tu torta</span>
           <h2 class="h2 h2--light" data-split>Cuéntanos tu idea y la <em>convertimos en torta</em></h2>
           <p class="contacto__text" data-reveal>Respondemos por WhatsApp. Pedidos con mínimo 3 días de anticipación.</p>
           <a class="contacto__phone" href="https://wa.me/573176476868" target="_blank" rel="noopener" data-reveal>+57 317 647 6868</a>

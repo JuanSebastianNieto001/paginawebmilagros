@@ -155,13 +155,14 @@ em { font-style: italic; }
 /* ================= TABLERO ================= */
 .board-wrap {
   position: relative; width: 100%;
-  height: calc(4320px * var(--s));
+  height: calc(5460px * var(--s));
   background: linear-gradient(180deg,
-    #f7c2f0 0, #f7c2f0 calc(732px * var(--s)), #fbe1f3 calc(1462px * var(--s)), #ffffff calc(2282px * var(--s)),
-    #fbeff7 calc(3103px * var(--s)), #b48aa8 calc(3742px * var(--s)), #48133d calc(4320px * var(--s)));
+    #f7c2f0 0, #f7c2f0 calc(732px * var(--s)), #fbe1f3 calc(1462px * var(--s)), #fff6fb calc(2282px * var(--s)),
+    #fbe1f3 calc(2860px * var(--s)), #ffffff calc(3420px * var(--s)),
+    #fbeff7 calc(4243px * var(--s)), #b48aa8 calc(4882px * var(--s)), #48133d calc(5460px * var(--s)));
 }
 .board {
-  position: relative; width: 1440px; height: 4320px;
+  position: relative; width: 1440px; height: 5460px;
   margin-left: calc((100% - 1440px * var(--s)) / 2);
   transform: scale(var(--s)); transform-origin: top left;
   font-family: var(--sans); color: var(--ink);
@@ -172,7 +173,7 @@ em { font-style: italic; }
 .beam { position: absolute; pointer-events: none; background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.55) 50%, rgba(255,255,255,0) 100%); animation: beam 9s ease-in-out infinite; }
 .beam--1 { top: -380px; left: 200px; width: 260px; height: 1800px; transform: rotate(28deg); }
 .beam--2 { top: -280px; left: 700px; width: 140px; height: 1900px; transform: rotate(28deg); opacity: .85; animation-delay: -4s; }
-.beam--3 { top: 2120px; left: -100px; width: 220px; height: 1700px; transform: rotate(-26deg); animation-delay: -2s; --dir: -1; }
+.beam--3 { top: 3260px; left: -100px; width: 220px; height: 1700px; transform: rotate(-26deg); animation-delay: -2s; --dir: -1; }
 @keyframes beam { 0%, 100% { translate: 0 0; opacity: .9; } 50% { translate: 40px 0; opacity: 1; } }
 .glow { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 70% 12%, rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 45%); }
 
@@ -230,11 +231,6 @@ em { font-style: italic; }
 .ph { position: relative; overflow: hidden; }
 .ph > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .ph__label { position: relative; }
-/* Foto en tarjeta: las fotos del Instagram son verticales y la tarjeta apaisada,
-   así que la torta se muestra completa sobre su propio fondo desenfocado */
-.ph--photo { background: var(--plum) center / cover no-repeat; /* background-image va inline en el HTML */ }
-.ph--photo::before { content: ''; position: absolute; inset: 0; background: rgba(72,19,61,.22); }
-.ph--photo > img { object-fit: contain; filter: drop-shadow(0 10px 18px rgba(46,10,39,.35)); }
 
 /* Botones */
 .btn {
@@ -311,37 +307,99 @@ em { font-style: italic; }
 .hero__washi { top: 1030px; left: 640px; width: 220px; height: 38px; transform: rotate(-8deg); }
 
 /* ================= 01 TORTAS ================= */
-.tortas { top: 1180px; height: 1000px; }
+.tortas { top: 1180px; height: 1080px; }
 .tortas__rule { top: 0; left: 72px; width: 1296px; }
 .tortas__tag { top: 40px; left: 72px; }
 .tortas__title { position: absolute; top: 110px; left: 72px; width: 480px; }
 .tortas__sp { top: 96px; left: 560px; width: 34px; height: 34px; }
-.tortas__plum { top: 400px; left: 72px; width: 440px; height: 540px; padding: 44px; gap: 16px; }
+.tortas__plum { top: 440px; left: 72px; width: 440px; height: 540px; padding: 44px; gap: 16px; }
 .tortas__plum p { font-size: 18px; }
 .tortas__plum .plum__hash { font-size: 28px; }
-.tortas__pin { top: 385px; left: 60px; width: 26px; height: 26px; box-shadow: 0 8px 14px rgba(72,19,61,.3); }
-.cards { position: absolute; top: 40px; left: 620px; width: 748px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
-.card { height: 280px; padding: 16px; display: flex; flex-direction: column; gap: 12px; box-shadow: 0 24px 50px rgba(72,19,61,.18); transition: transform .6s var(--ease), box-shadow .6s var(--ease); }
+.tortas__pin { top: 425px; left: 60px; width: 26px; height: 26px; box-shadow: 0 8px 14px rgba(72,19,61,.3); }
+.cards { position: absolute; top: 40px; left: 620px; width: 748px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.card { position: relative; height: 420px; padding: 14px 14px 16px; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 24px 50px rgba(72,19,61,.18); transition: transform .6s var(--ease), box-shadow .6s var(--ease); }
+.card[hidden] { display: none; }
 .card:hover { transform: translateY(-6px) rotate(-.6deg); box-shadow: 0 34px 60px rgba(72,19,61,.28); }
-.card--white { background: #fff; }
-.card--plum { background: var(--plum-grad); box-shadow: 0 24px 50px rgba(72,19,61,.3); }
-.card--pink { background: linear-gradient(160deg, #fbe4f4 0%, #f7c2f0 100%); box-shadow: 0 24px 50px rgba(72,19,61,.2); }
-.card__media { flex: 1; display: flex; align-items: flex-end; padding: 12px; font-size: 10px; letter-spacing: .22em; text-transform: uppercase; }
-.ph--plum { background: var(--photo-grad); color: var(--pink); }
-.ph--plum2 { background: var(--plum-grad); color: var(--pink); }
-.ph--pink { background: linear-gradient(160deg, #fbe4f4 0%, #f7c2f0 100%); color: var(--plum); }
-.ph--white { background: #fff; color: var(--mauve); }
-.ph--mauve { background: var(--mauve); color: #fff; }
-.card__head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
-.card h3 { margin: 0; font-family: var(--serif); font-weight: 500; font-size: 30px; color: var(--plum); }
-.card--plum h3 { color: #fff; }
-.card__hash { font-size: 22px; }
-.card--plum .card__hash { color: var(--pink); }
-.card--pink .card__hash { color: var(--mauve); }
+.card[data-tone="white"] { background: #fff; }
+.card[data-tone="plum"] { background: var(--plum-grad); box-shadow: 0 24px 50px rgba(72,19,61,.3); }
+.card[data-tone="pink"] { background: linear-gradient(160deg, #fbe4f4 0%, #f7c2f0 100%); box-shadow: 0 24px 50px rgba(72,19,61,.2); }
+
+/* Recortes (PNG/WebP con transparencia): la torta flota sobre la tarjeta.
+   Un halo de luz detras y una sombra de apoyo debajo le dan volumen sin filtros costosos. */
+.card__media, .producto__media { position: relative; flex: 1; min-height: 0; }
+.card__media::before, .producto__media::before {
+  content: ''; position: absolute; left: 4%; right: 4%; top: 6%; bottom: 8%; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(247,194,240,.6), rgba(247,194,240,0));
+}
+[data-tone="plum"] > .card__media::before, [data-tone="plum"] > .producto__media::before { background: radial-gradient(closest-side, rgba(255,255,255,.2), rgba(255,255,255,0)); }
+[data-tone="pink"] > .card__media::before, [data-tone="pink"] > .producto__media::before { background: radial-gradient(closest-side, rgba(255,255,255,.75), rgba(255,255,255,0)); }
+.card__media::after, .producto__media::after {
+  content: ''; position: absolute; left: 16%; right: 16%; bottom: 0; height: 16px; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(46,10,39,.32), rgba(46,10,39,0));
+}
+[data-tone="plum"] > .card__media::after, [data-tone="plum"] > .producto__media::after { background: radial-gradient(closest-side, rgba(0,0,0,.5), rgba(0,0,0,0)); }
+.card__media img, .producto__media img {
+  position: absolute; z-index: 1; left: 0; top: 0; width: 100%; height: calc(100% - 5px);
+  object-fit: contain; object-position: center bottom; transition: transform .6s var(--ease);
+}
+.card:hover .card__media img, .producto:hover .producto__media img { transform: translateY(-4px) scale(1.03); }
+@media (hover: hover) and (pointer: fine) {
+  .card__media img, .producto__media img { filter: drop-shadow(0 12px 12px rgba(46,10,39,.22)); }
+}
+.card__head { display: flex; flex-direction: column; gap: 2px; }
+.card h3 { margin: 0; font-family: var(--serif); font-weight: 500; font-size: 27px; line-height: 1.05; color: var(--plum); }
+.card[data-tone="plum"] h3 { color: #fff; }
+.card__hash { font-size: 19px; }
+.card[data-tone="plum"] .card__hash { color: var(--pink); }
+.card[data-tone="pink"] .card__hash { color: var(--mauve); }
+
+/* Filtros por celebracion y paginador */
+.tortas__filters { position: absolute; top: 300px; left: 72px; width: 470px; }
+.filters { display: flex; flex-wrap: wrap; gap: 10px; }
+.filter {
+  padding: 8px 16px; border: 1px solid var(--plum); border-radius: 0; background: rgba(255,255,255,.55); color: var(--plum);
+  font: 500 19px/1.1 var(--sans); cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: background-color .3s var(--ease), color .3s var(--ease), transform .3s var(--ease), box-shadow .3s var(--ease);
+}
+.filter:hover { transform: translateY(-2px); }
+.filter.is-active { background: var(--plum); color: #fff; box-shadow: 0 10px 20px rgba(72,19,61,.28); }
+.tortas__pager { position: absolute; top: 934px; left: 620px; width: 748px; }
+.pager { display: flex; align-items: center; justify-content: center; gap: 18px; }
+.pager[hidden] { display: none; }
+.pager__btn {
+  width: 48px; height: 48px; display: grid; place-items: center; padding: 0; border: 1px solid var(--plum); border-radius: 50%;
+  background: #fff; color: var(--plum); cursor: pointer; box-shadow: 0 10px 20px rgba(72,19,61,.18); -webkit-tap-highlight-color: transparent;
+  transition: background-color .3s var(--ease), color .3s var(--ease), transform .3s var(--ease);
+}
+.pager__btn:hover { background: var(--plum); color: #fff; transform: scale(1.06); }
+.pager__count { min-width: 74px; text-align: center; font: 600 26px/1 var(--script); color: var(--plum); }
+
 .tortas__washi { top: 660px; left: 520px; width: 180px; height: 34px; background: rgba(247,194,240,.8); transform: rotate(6deg); }
 
-/* ================= 02 CÓMO PEDIR ================= */
-.pedir { top: 2220px; height: 620px; }
+/* ================= 02 MÁS ANTOJOS ================= */
+.antojos { top: 2300px; height: 1020px; }
+.antojos__rule { top: 0; left: 72px; width: 1296px; }
+.antojos__tag { top: 40px; left: 72px; }
+.antojos__title { position: absolute; top: 110px; left: 72px; width: 600px; }
+.antojos__sp { top: 104px; left: 672px; width: 30px; height: 30px; }
+.antojos__lead { position: absolute; top: 140px; left: 760px; width: 560px; margin: 0; font-size: 22px; line-height: 1.5; color: var(--plum); }
+.antojos__washi { top: 300px; left: 1250px; width: 170px; height: 34px; transform: rotate(-8deg); }
+.productos { position: absolute; top: 330px; left: 72px; width: 1296px; display: flex; flex-wrap: wrap; justify-content: center; gap: 40px 28px; }
+.producto {
+  position: relative; flex: 0 0 303px; height: 310px; padding: 18px 20px 18px; display: flex; flex-direction: column; gap: 6px;
+  box-shadow: 0 30px 60px rgba(72,19,61,.22); transform: rotate(var(--rot, 0deg));
+}
+.producto[data-tone="white"] { background: var(--paper); }
+.producto[data-tone="plum"] { background: var(--plum-grad); box-shadow: 0 30px 60px rgba(72,19,61,.32); }
+.producto[data-tone="pink"] { background: linear-gradient(160deg, #fbe4f4 0%, #f7c2f0 100%); }
+.producto .pin--top { top: -14px; margin-left: -13px; width: 26px; height: 26px; z-index: 2; }
+.producto h3 { margin: 4px 0 0; font-family: var(--serif); font-weight: 600; font-size: 28px; line-height: 1.05; color: var(--plum); }
+.producto p { margin: 0; font-size: 17px; line-height: 1.35; color: var(--body); }
+.producto[data-tone="plum"] h3 { color: #fff; }
+.producto[data-tone="plum"] p { color: var(--blush-2); }
+
+/* ================= 03 CÓMO PEDIR ================= */
+.pedir { top: 3360px; height: 620px; }
 .pedir__band { position: absolute; top: 120px; left: 0; width: 1440px; height: 360px; background: var(--plum-grad); box-shadow: 0 40px 80px rgba(72,19,61,.3); }
 .pedir__tag { top: 0; left: 72px; }
 .pedir__title { position: absolute; top: -10px; left: 340px; font-size: 64px; line-height: 1; }
@@ -353,8 +411,8 @@ em { font-style: italic; }
 .step h3 { margin: 0; font-family: var(--serif); font-weight: 500; font-size: 34px; color: var(--plum); }
 .step p { margin: 0; font-size: 15px; line-height: 1.6; color: var(--body); }
 
-/* ================= 03 HISTORIA ================= */
-.historia { top: 2900px; height: 760px; }
+/* ================= 04 HISTORIA ================= */
+.historia { top: 4040px; height: 760px; }
 .historia__rule { top: 0; left: 72px; width: 1296px; }
 .historia__tag { top: 40px; left: 72px; }
 .historia__copy { position: absolute; top: 120px; left: 72px; width: 640px; display: flex; flex-direction: column; gap: 24px; }
@@ -368,8 +426,8 @@ em { font-style: italic; }
 .note__quote { font-family: var(--serif); font-style: italic; font-size: 24px; line-height: 1.2; color: var(--plum); }
 .note__hash { font-size: 22px; }
 
-/* ================= 04 CONTACTO ================= */
-.contacto { top: 3700px; height: 620px; }
+/* ================= 05 CONTACTO ================= */
+.contacto { top: 4840px; height: 620px; }
 .contacto__copy { position: absolute; top: 56px; left: 72px; width: 560px; display: flex; flex-direction: column; gap: 22px; color: #fff; }
 .kicker { font-size: 12px; letter-spacing: .34em; text-transform: uppercase; color: var(--pink); }
 .contacto__text { margin: 0; font-size: 17px; line-height: 1.7; color: var(--blush-2); max-width: 480px; }
@@ -561,12 +619,12 @@ html.is-intro .mili { opacity: 0; transform: translateY(30px); pointer-events: n
   .nav__links a::before { background: var(--berry); }
   .nav__links.is-open { clip-path: circle(150% at calc(100% - 42px) 36px); }
 
-  .board-wrap { height: auto; background: linear-gradient(180deg, #f7c2f0 0%, #f7c2f0 14%, #fbe1f3 32%, #ffffff 50%, #fbeff7 68%, #b48aa8 84%, #48133d 100%); }
+  .board-wrap { height: auto; background: linear-gradient(180deg, #f7c2f0 0%, #f7c2f0 11%, #fbe1f3 26%, #fff6fb 40%, #fbe1f3 52%, #ffffff 62%, #fbeff7 76%, #b48aa8 88%, #48133d 100%); }
   .board { width: auto; height: auto; margin: 0; transform: none; }
   .beam { display: none; }
   .glow { background: radial-gradient(ellipse at 70% 4%, rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 30%); }
   .board > section { position: relative; top: auto; width: auto; height: auto; padding: 48px 20px; display: flex; flex-direction: column; gap: 22px; }
-  .line, .hero__band, .pedir__band, .washi, .thread, .hero__pin, .tortas__pin, .hero__sp1, .hero__sp2, .tortas__sp, .pedir__sp { display: none; }
+  .line, .hero__band, .pedir__band, .washi, .thread, .hero__pin, .tortas__pin, .hero__sp1, .hero__sp2, .tortas__sp, .pedir__sp, .antojos__sp { display: none; }
   .tag, .note, .plum, .arch, .h2, .hero__title, .hero__script, .cards, .steps, .historia__copy, .contacto__copy, .form, .footer, .tortas__title, .pedir__title { position: relative; top: auto; left: auto; width: auto; height: auto; }
   .tag { align-self: flex-start; white-space: normal; font-size: 11px; padding: 10px 18px; }
   .h2 { font-size: clamp(42px, 11vw, 60px); }
@@ -592,9 +650,20 @@ html.is-intro .mili { opacity: 0; transform: translateY(30px); pointer-events: n
   /* Tortas */
   .tortas__plum { padding: 32px 26px 230px; gap: 12px; }
   .vases { width: 100%; height: 220px; }
-  .cards { display: grid; grid-template-columns: 1fr; gap: 20px; }
-  .card { height: 240px; }
-  .card h3 { font-size: 26px; }
+  .tortas__filters, .tortas__pager, .antojos__title, .antojos__lead, .productos { position: relative; top: auto; left: auto; width: auto; }
+  .filter { font-size: 17px; padding: 7px 13px; }
+  .cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .card { height: 290px; padding: 10px 10px 12px; gap: 6px; }
+  .card h3 { font-size: 21px; }
+  .card__hash { font-size: 16px; }
+  .tortas__pager { margin-top: 4px; }
+
+  /* Mas antojos */
+  .antojos__lead { font-size: 19px; }
+  .productos { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px 14px; margin-top: 10px; }
+  .producto { flex: 0 0 calc(50% - 7px); height: 300px; padding: 14px 12px 14px; }
+  .producto h3 { font-size: 22px; }
+  .producto p { font-size: 15px; line-height: 1.3; }
 
   /* Cómo pedir */
   .pedir__title { font-size: clamp(40px, 10vw, 56px); }
@@ -622,7 +691,9 @@ html.is-intro .mili { opacity: 0; transform: translateY(30px); pointer-events: n
 }
 
 @media (min-width: 600px) and (max-width: 1000px) {
-  .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .card { height: 330px; }
+  .producto { flex-basis: calc(33.333% - 10px); }
   .steps { flex-direction: row; }
 }
 
@@ -630,7 +701,6 @@ html.is-intro .mili { opacity: 0; transform: translateY(30px); pointer-events: n
 @media (hover: none), (pointer: coarse) {
   .nav::before { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(247, 194, 240, .97); }
   .mili__char { filter: none; }
-  .ph--photo > img { filter: none; }
   .card:hover { transform: none; }
   .beam { display: none; }
 }
